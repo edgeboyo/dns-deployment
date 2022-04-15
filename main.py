@@ -3,7 +3,6 @@
 LICENSE http://www.apache.org/licenses/LICENSE-2.0
 """
 
-import argparse
 import datetime
 import sys
 import time
@@ -11,6 +10,8 @@ import threading
 import traceback
 import socketserver
 import struct
+
+from ArgumentParser import prepParser
 try:
     from dnslib import *
 except ImportError:
@@ -125,11 +126,7 @@ class UDPRequestHandler(BaseRequestHandler):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Start a DNS implemented in Python.')
-    parser = argparse.ArgumentParser(description='Start a DNS implemented in Python. Usually DNSs use UDP on port 53.')
-    parser.add_argument('--port', default=5053, type=int, help='The port to listen on.')
-    parser.add_argument('--tcp', action='store_true', help='Listen to TCP connections.')
-    parser.add_argument('--udp', action='store_true', help='Listen to UDP datagrams.')
+    parser = prepParser()
     
     args = parser.parse_args()
     if not (args.udp or args.tcp): parser.error("Please select at least one of --udp or --tcp.")
