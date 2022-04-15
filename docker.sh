@@ -30,7 +30,3 @@ do
         return 2
     fi
 done
-
- # use later
-
-# Going to finish this tomorrow
