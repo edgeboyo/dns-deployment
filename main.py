@@ -3,6 +3,7 @@
 LICENSE http://www.apache.org/licenses/LICENSE-2.0
 """
 
+from ast import arg
 import datetime
 import sys
 import time
@@ -10,6 +11,9 @@ import threading
 import traceback
 import socketserver
 import struct
+
+import threading
+from api.api import api_startup
 
 from ArgumentParser import prepParser
 try:
@@ -131,11 +135,17 @@ def main():
     args = parser.parse_args()
     if not (args.udp or args.tcp): parser.error("Please select at least one of --udp or --tcp.")
 
+    print("Starting API...")
+
+    httpServer = threading.Thread(target=api_startup, args=(args.aport , ))
+    httpServer.daemon = True
+    httpServer.start()
+
     print("Starting nameserver...")
 
     servers = []
-    if args.udp: servers.append(socketserver.ThreadingUDPServer(('', args.port), UDPRequestHandler))
-    if args.tcp: servers.append(socketserver.ThreadingTCPServer(('', args.port), TCPRequestHandler))
+    if args.udp: servers.append(socketserver.ThreadingUDPServer(('', args.dport), UDPRequestHandler))
+    if args.tcp: servers.append(socketserver.ThreadingTCPServer(('', args.dport), TCPRequestHandler))
 
     for s in servers:
         thread = threading.Thread(target=s.serve_forever)  # that thread will start one more thread for each request
