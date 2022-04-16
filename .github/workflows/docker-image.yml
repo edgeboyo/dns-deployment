@@ -35,7 +35,7 @@ jobs:
     - name: Tag with remote repository
       env:
         REPOSITORY: ${{ secrets.REPOSITORY_URL }}
-      run: docker tag dns-deployment "$REPOSITORY/dns-deployment"
+      run: docker tag dns-deployment:test "$REPOSITORY/dns-deployment"
       
     - name: Push to remote repository
       run: docker push "$REPOSITORY/dns-deployment"
