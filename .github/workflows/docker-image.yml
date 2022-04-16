@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Image CI (build and publish)
 
 on:
   push:
@@ -9,10 +9,18 @@ on:
 jobs:
 
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build --tag dns-deployment:test .
+        
+    - name: Login to Docker Repository
+      run: docker login --username ${{secrets.REPOSITORY_USERNAME}} --password ${{secrets.REPOSITORY_PASSWORD}}
+      
+    - name: Tag with remote repository
+      run: docker tag dns-deployment registry.digitalocean.com/part3-project/dns-deployment
+      
+    - name: Push to remote repository
+      run: docker push registry.digitalocean.com/part3-project/dns-deployment
