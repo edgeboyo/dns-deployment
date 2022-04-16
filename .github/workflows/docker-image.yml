@@ -33,7 +33,9 @@ jobs:
         # logout: # optional, default is true
       
     - name: Tag with remote repository
-      run: docker tag dns-deployment registry.digitalocean.com/part3-project/dns-deployment
+      env:
+        REPOSITORY: ${{ secrets.REPOSITORY_URL }}
+      run: docker tag dns-deployment "$REPOSITORY/dns-deployment"
       
     - name: Push to remote repository
-      run: docker push registry.digitalocean.com/part3-project/dns-deployment
+      run: docker push "$REPOSITORY/dns-deployment"
