@@ -6,6 +6,7 @@ def prepParser():
     parser.add_argument('--aport', default=80, type=int, help='The port to listen on for the HTTP API and GUI.')
     parser.add_argument('--tcp', action='store_true', help='Listen to TCP connections.')
     parser.add_argument('--udp', action='store_true', help='Listen to UDP datagrams.')
+    parser.add_argument('--dry-run', action="store_true", help="Initialize the program and exit immediately")
 
     return parser
 
