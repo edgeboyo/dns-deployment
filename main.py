@@ -143,6 +143,14 @@ def main():
         thread.start()
         print("%s server loop running in thread: %s" % (s.RequestHandlerClass.__name__[:3], thread.name))
 
+    def shutdown():
+        for s in servers:
+            s.shutdown()
+
+    if args.dry_run:
+        shutdown()
+        return
+
     try:
         while 1:
             time.sleep(1)
@@ -152,8 +160,7 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
-        for s in servers:
-            s.shutdown()
+        shutdown()
 
 if __name__ == '__main__':
     main()
