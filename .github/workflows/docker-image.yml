@@ -38,4 +38,6 @@ jobs:
       run: docker tag dns-deployment:test "$REPOSITORY/dns-deployment"
       
     - name: Push to remote repository
+      env:
+          REPOSITORY: ${{ secrets.REPOSITORY_URL }}
       run: docker push "$REPOSITORY/dns-deployment"
