@@ -13,16 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install modules
+      - name: Install modules (test requirements file)
         run: pip3 install -r requirements.txt
-
-      - name: Initialize and exit
-        run: python3 main.py --tcp --dry-run
 
       - name: Build the Docker image
         run: docker build --tag dns-deployment .
 
   Publish:
+    needs: Dry_Run_and_Build
     runs-on: ubuntu-latest
     env:
       USERNAME: ${{ secrets.REPOSITORY_USERNAME }}
