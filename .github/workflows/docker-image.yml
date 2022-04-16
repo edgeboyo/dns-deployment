@@ -17,7 +17,7 @@ jobs:
       run: docker build --tag dns-deployment:test .
         
     - name: Login to Docker Repository
-      run: docker login --username ${{secrets.REPOSITORY_USERNAME}} --password ${{secrets.REPOSITORY_PASSWORD}}
+      run: docker login --username "${{secrets.REPOSITORY_USERNAME}}" --password "${{secrets.REPOSITORY_PASSWORD}}"
       
     - name: Tag with remote repository
       run: docker tag dns-deployment registry.digitalocean.com/part3-project/dns-deployment
