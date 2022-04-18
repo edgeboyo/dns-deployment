@@ -1,8 +1,19 @@
 
+from .handlers import createTCPServer, createUDPServer
+import threading
+
+
 def createDNSServer(dns_type, dns_port):
+    server = None
     if dns_type == 'TCP':
-        return socketserver.ThreadingTCPServer(
-            ('', dns_port), TCPRequestHandler)
+        server = createTCPServer(dns_port)
     elif dns_type == 'UDP':
-        return socketserver.ThreadingUDPServer(
-            ('', dns_port), UDPRequestHandler)
+        server = createUDPServer(dns_port)
+
+    thread = threading.Thread(target=server.serve_forever)
+    thread.daemon = True  # exit the server thread when the main thread terminates
+    thread.start()
+    print("%s server loop running in thread: %s" %
+          (server.RequestHandlerClass.__name__[:3], thread.name))
+
+    return server
