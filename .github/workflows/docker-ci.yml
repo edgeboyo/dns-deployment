@@ -16,6 +16,9 @@ jobs:
       - name: Install modules (test requirements file)
         run: pip3 install -r requirements.txt
 
+      - name: Dry run (run, check args and exit)
+        run: python3 main.py --tcp --dry-run
+
       - name: Build the Docker image
         run: docker build --tag dns-deployment .
 
