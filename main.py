@@ -12,6 +12,7 @@ from api.api import api_startup
 
 from ArgumentParser import prepParser
 from dns.dns import createDNSServer
+from objects.io import setDataFolder
 
 
 def error_out(message, code=2):
@@ -55,6 +56,10 @@ def startup_checklist():
     if args.dry_run:
         print("This configuration appears valid. Ending program due to dry run argument")
         exit()
+
+    # Select data folder and set it internally
+
+    setDataFolder(args.data_folder)
 
     return (dns_type, dns_port, http_port)
 
