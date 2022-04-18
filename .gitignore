@@ -7,3 +7,6 @@ __pycache__
 
 # Workflow files
 !.github
+
+# Data folder
+data

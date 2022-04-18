@@ -46,7 +46,8 @@ soa_record = SOA(
 ns_records = [NS(D.ns1), NS(D.ns2)]
 records = {
     D: [A(IP), AAAA((0,) * 16), MX(D.mail), soa_record] + ns_records,
-    D.ns1: [A(IP)],  # MX and NS records must never point to a CNAME alias (RFC 2181 section 10.3)
+    # MX and NS records must never point to a CNAME alias (RFC 2181 section 10.3)
+    D.ns1: [A(IP)],
     D.ns2: [A(IP)],
     D.mail: [A(IP)],
     D.andrei: [CNAME(D)],
@@ -58,7 +59,8 @@ def dns_response(data):
 
     print(request)
 
-    reply = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
+    reply = DNSRecord(DNSHeader(id=request.header.id,
+                      qr=1, aa=1, ra=1), q=request.q)
 
     qname = request.q.qname
     qn = str(qname)
@@ -72,12 +74,15 @@ def dns_response(data):
                 for rdata in rrs:
                     rqt = rdata.__class__.__name__
                     if qt in ['*', rqt]:
-                        reply.add_answer(RR(rname=qname, rtype=getattr(QTYPE, rqt), rclass=1, ttl=TTL, rdata=rdata))
+                        reply.add_answer(RR(rname=qname, rtype=getattr(
+                            QTYPE, rqt), rclass=1, ttl=TTL, rdata=rdata))
 
         for rdata in ns_records:
-            reply.add_ar(RR(rname=D, rtype=QTYPE.NS, rclass=1, ttl=TTL, rdata=rdata))
+            reply.add_ar(RR(rname=D, rtype=QTYPE.NS,
+                         rclass=1, ttl=TTL, rdata=rdata))
 
-        reply.add_auth(RR(rname=D, rtype=QTYPE.SOA, rclass=1, ttl=TTL, rdata=soa_record))
+        reply.add_auth(RR(rname=D, rtype=QTYPE.SOA,
+                       rclass=1, ttl=TTL, rdata=soa_record))
 
     print("---- Reply:\n", reply)
 
@@ -95,7 +100,7 @@ class BaseRequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
         now = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
         print("\n\n%s request %s (%s %s):" % (self.__class__.__name__[:3], now, self.client_address[0],
-                                               self.client_address[1]))
+                                              self.client_address[1]))
         try:
             data = self.get_data()
             print(len(data), data)  # repr(data).replace('\\x', '')[1:-1]
@@ -129,29 +134,46 @@ class UDPRequestHandler(BaseRequestHandler):
         return self.request[1].sendto(data, self.client_address)
 
 
-def main():
+def startup_checklist():
+    # Check if a data folder is present
+    import os
+
+    if not (os.path.exists("./data") and os.path.isdir("./data")):
+        print("Data folder missing. An empty folder will be created")
+        os.mkdir("./data")
+    return None
+
+
+def server_startup():
     parser = prepParser()
-    
+
     args = parser.parse_args()
-    if not (args.udp or args.tcp): parser.error("Please select at least one of --udp or --tcp.")
+    if not (args.udp or args.tcp):
+        parser.error("Please select at least one of --udp or --tcp.")
 
     print("Starting API...")
 
-    httpServer = threading.Thread(target=api_startup, args=(args.aport , ))
+    httpServer = threading.Thread(target=api_startup, args=(args.aport, ))
     httpServer.daemon = True
     httpServer.start()
 
     print("Starting nameserver...")
 
     servers = []
-    if args.udp: servers.append(socketserver.ThreadingUDPServer(('', args.dport), UDPRequestHandler))
-    if args.tcp: servers.append(socketserver.ThreadingTCPServer(('', args.dport), TCPRequestHandler))
+    if args.udp:
+        servers.append(socketserver.ThreadingUDPServer(
+            ('', args.dport), UDPRequestHandler))
+    if args.tcp:
+        servers.append(socketserver.ThreadingTCPServer(
+            ('', args.dport), TCPRequestHandler))
 
     for s in servers:
-        thread = threading.Thread(target=s.serve_forever)  # that thread will start one more thread for each request
+        # that thread will start one more thread for each request
+        thread = threading.Thread(target=s.serve_forever)
         thread.daemon = True  # exit the server thread when the main thread terminates
         thread.start()
-        print("%s server loop running in thread: %s" % (s.RequestHandlerClass.__name__[:3], thread.name))
+        print("%s server loop running in thread: %s" %
+              (s.RequestHandlerClass.__name__[:3], thread.name))
 
     def shutdown():
         for s in servers:
@@ -172,5 +194,7 @@ def main():
     finally:
         shutdown()
 
+
 if __name__ == '__main__':
-    main()
+    startup_checklist()
+    server_startup()
