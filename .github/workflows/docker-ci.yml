@@ -1,0 +1,46 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  Dry_Run_and_Build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install modules (test requirements file)
+        run: pip3 install -r requirements.txt
+
+      - name: Build the Docker image
+        run: docker build --tag dns-deployment .
+
+      - name: Create docker container from image
+        run: docker container create dns-deployment
+
+  Publish:
+    if: github.ref == 'refs/heads/main'
+    needs: Dry_Run_and_Build
+    runs-on: ubuntu-latest
+    env:
+      USERNAME: ${{ secrets.REPOSITORY_USERNAME }}
+      PASSWORD: ${{ secrets.REPOSITORY_PASSWORD }}
+      REPOSITORY: ${{ secrets.REPOSITORY_URL }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build the Docker image for pushing
+        run: docker build --tag dns-deployment .
+
+      - name: Login to repository
+        run: docker login --username "$USERNAME" --password "$PASSWORD" "$REPOSITORY"
+
+      - name: Tag with remote repository
+        run: docker tag dns-deployment "$REPOSITORY/dns-deployment"
+
+      - name: Push to remote repository
+        run: docker push "$REPOSITORY/dns-deployment"

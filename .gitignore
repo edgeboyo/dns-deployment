@@ -4,3 +4,6 @@
 
 # Pycache
 __pycache__
+
+# Workflow files
+!.github

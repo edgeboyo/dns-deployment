@@ -150,6 +150,12 @@ def server_startup(dns_type, dns_port, http_port, dry_run):
     httpServer.daemon = True
     httpServer.start()
 
+    print("Starting API...")
+
+    httpServer = threading.Thread(target=api_startup, args=(args.aport , ))
+    httpServer.daemon = True
+    httpServer.start()
+
     print("Starting nameserver...")
 
     dnsServer = None
@@ -170,6 +176,14 @@ def server_startup(dns_type, dns_port, http_port, dry_run):
         shutdown()
         return
 
+    def shutdown():
+        for s in servers:
+            s.shutdown()
+
+    if args.dry_run:
+        shutdown()
+        return
+
     try:
         while 1:
             time.sleep(1)
@@ -180,7 +194,6 @@ def server_startup(dns_type, dns_port, http_port, dry_run):
         pass
     finally:
         shutdown()
-
 
 if __name__ == '__main__':
     (dns_type, dns_port, http_port, dry_run) = startup_checklist()
