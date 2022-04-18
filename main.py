@@ -72,6 +72,8 @@ def server_startup(dns_type, dns_port, http_port):
     httpServer.daemon = True
     httpServer.start()
 
+    time.sleep(.5)  # to allow for cleaner output
+
     print("Starting nameserver...")
 
     dnsServer = createDNSServer(dns_type, dns_port)

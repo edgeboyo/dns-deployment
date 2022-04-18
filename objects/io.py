@@ -16,7 +16,7 @@ def setDataFolder(path):
     dataFolder = path
 
 
-def fetchDomainFile(domainName):
+def fetchDomainFile(domainName, mode='r'):
     filePath = os.path.join(dataFolder, domainName + ".json")
 
     if os.path.exists(filePath) and os.path.isfile(filePath):
@@ -35,4 +35,4 @@ def listDomainFiles():
 def listDomainNames():
     domains = os.listdir(dataFolder)
     domains = filter(lambda d: os.fsdecode(d).endswith(".json"), domains)
-    return [os.path.basename(domain) for domain in domains]
+    return [domain[:-5] for domain in domains]

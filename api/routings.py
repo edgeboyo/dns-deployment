@@ -1,14 +1,12 @@
-import os
-import json
 from flask import Flask, request
 
-from .returns import return_json, return_error
+from objects.domain import createNewDomain, fetchAllDomainNames
+
+from api.returns import return_json, return_error
 
 tld = "tld"  # will be imported from config later
 
 app = Flask(__name__)
-
-# ROUTINGS BEGIN HERE
 
 
 @app.route("/")
@@ -26,16 +24,7 @@ def api_root():
 @app.route("/api/domains", methods=['GET'])
 def api_domains_get():
     domains = []
-    for file in os.listdir('./data'):
-        if not os.fsdecode(file).endswith('.json'):
-            continue
-
-        filePath = f"./data/{file}"
-
-        with open(filePath) as f:
-            domainInfo = json.load(f)
-            domainName = domainInfo['domainName']
-
+    for domainName in fetchAllDomainNames():
         domain = {"domainName": domainName,
                   "resource": f"/api/domains/{domainName}", "uri": f"{domainName}.{tld}", "records": f"/api/domains/{domainName}/records"}
 
@@ -58,16 +47,17 @@ def api_domains_post():
     if not domainName:
         return return_error("`domainName` field missing in request")
 
-    filePath = f"./data/{domainName}.json"
-
-    if os.path.exists(filePath):
-        return return_error(f"Domain {domainName} already exists", 409)
-
-    with open(filePath, "w") as f:
-        domain = {"domainName": domainName, "records": {}}
-        json.dump(domain, f, indent=4)
+    try:
+        createNewDomain(domainName)
+    except Exception as e:
+        return return_error(str(e), 409)
 
     domain = {"domainName": domainName,
               "resource": f"/api/domains/{domainName}", "uri": f"{domainName}.{tld}", "records": f"/api/domains/{domainName}/records"}
 
     return return_json(domain)
+
+
+@app.route("/api/domains/{domainName}", methods=["GET"])
+def api_domain_details(domainName):
+    pass
