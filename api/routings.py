@@ -2,25 +2,11 @@ import os
 import json
 from flask import Flask, request
 
+from .returns import return_json, return_error
+
 tld = "tld"  # will be imported from config later
 
 app = Flask(__name__)
-
-
-def return_json(object, code=200):
-    response = app.response_class(
-        response=json.dumps(object),
-        status=code,
-        mimetype="application/json"
-    )
-    return response
-
-
-def return_error(message, code=400):
-    error = {"message": message}
-
-    return return_json(error, code)
-
 
 # ROUTINGS BEGIN HERE
 
@@ -30,14 +16,14 @@ def gui_root():
     return "<p>This will be the GUI root later</p>"
 
 
-@app.route("/api/")
+@app.route("/api")
 def api_root():
     data = {"documentation": "/api/docs",
             "topLevelDomain": f".{tld}", "domains": "/api/domains"}
     return return_json(data)
 
 
-@app.route("/api/domains/", methods=['GET', 'POST'])
+@app.route("/api/domains", methods=['GET'])
 def api_domains_get():
     domains = []
     for file in os.listdir('./data'):
@@ -58,12 +44,14 @@ def api_domains_get():
     return return_json(domains)
 
 
-@app.route("/api/domains/", methods=[''])
+@app.route("/api/domains", methods=['POST'])
 def api_domains_post():
-    data = request.get_json()
+    print("AAAAAAAAAAAAAAAAAAAAA")
 
-    if not data:
+    if not request.is_json:
         return return_error("Data not formatted as JSON")
+
+    data = request.get_json()
 
     domainName = data['domainName']
 
@@ -73,7 +61,7 @@ def api_domains_post():
     filePath = f"./data/{domainName}.json"
 
     if os.path.exists(filePath):
-        return return_error(f"Domain {filePath} already exists", 409)
+        return return_error(f"Domain {domainName} already exists", 409)
 
     with open(filePath, "w") as f:
         domain = {"domainName": domainName, "records": {}}
