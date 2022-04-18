@@ -15,10 +15,15 @@ def createNewDomain(domainName):
     for record in records:
         domain['records'][record] = []
 
-    with open(fetchDomainFile(domainName), "w") as f:
+    with open(fetchDomainFile(domainName, True), "w") as f:
         json.dump(domain, f, indent=4)
 
     return domain
+
+
+def fetchDomain(domainName):
+    with open(fetchDomainFile(domainName)) as f:
+        return json.load(f)
 
 
 def fetchAllDomainNames():

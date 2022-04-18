@@ -16,11 +16,16 @@ def setDataFolder(path):
     dataFolder = path
 
 
-def fetchDomainFile(domainName, mode='r'):
+def fetchDomainFile(domainName, forCreation=False):
     filePath = os.path.join(dataFolder, domainName + ".json")
 
-    if os.path.exists(filePath) and os.path.isfile(filePath):
+    exists = os.path.exists(filePath) and os.path.isfile(filePath)
+
+    if exists and forCreation:
         raise Exception(f"Domain `{domainName}` already exists")
+
+    elif not exists and not forCreation:
+        raise Exception(f"Domain `{domainName} does not exist")
 
     return filePath
 

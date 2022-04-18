@@ -1,6 +1,6 @@
 from flask import Flask, request
 
-from objects.domain import createNewDomain, fetchAllDomainNames
+from objects.domain import createNewDomain, fetchAllDomainNames, fetchDomain
 
 from api.returns import return_json, return_error
 
@@ -35,8 +35,6 @@ def api_domains_get():
 
 @app.route("/api/domains", methods=['POST'])
 def api_domains_post():
-    print("AAAAAAAAAAAAAAAAAAAAA")
-
     if not request.is_json:
         return return_error("Data not formatted as JSON")
 
@@ -58,6 +56,13 @@ def api_domains_post():
     return return_json(domain)
 
 
-@app.route("/api/domains/{domainName}", methods=["GET"])
+@app.route("/api/domains/<domainName>", methods=["GET"])
 def api_domain_details(domainName):
-    pass
+    try:
+        domain = fetchDomain(domainName)
+    except Exception as e:
+        return_error(str(e))
+
+    domain['records'] = f'/api/domains/{domainName}/records'
+
+    return return_json(domain)
