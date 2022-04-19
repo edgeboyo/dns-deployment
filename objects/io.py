@@ -25,7 +25,7 @@ def fetchDomainFile(domainName, forCreation=False):
         raise Exception(f"Domain `{domainName}` already exists")
 
     elif not exists and not forCreation:
-        raise Exception(f"Domain `{domainName} does not exist")
+        raise Exception(f"Domain `{domainName}` does not exist")
 
     return filePath
 

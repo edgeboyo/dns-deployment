@@ -61,7 +61,7 @@ def api_domain_details(domainName):
     try:
         domain = fetchDomain(domainName)
     except Exception as e:
-        return_error(str(e), 404)
+        return return_error(str(e), 404)
 
     domain['records'] = f'/api/domains/{domainName}/records'
 
@@ -72,11 +72,11 @@ def api_domain_records(domainName):
     try:
         domain = fetchDomain(domainName)
     except Exception as e:
-        return_error(str(e), 404)
+        return return_error(str(e), 404)
 
     records = domain['records']
 
-    for type, recs in records:
+    for type, recs in records.items():
         records[type] = {"records": f"/api/domains/{domainName}/records/{type.lower()}", "amount": len(recs)}
 
     return return_json(records)
@@ -86,7 +86,7 @@ def api_domain_records_specific(domainName, recordType):
     try:
         domain = fetchDomain(domainName)
     except Exception as e:
-        return_error(str(e), 404)
+        return return_error(str(e), 404)
 
     recordType = recordType.upper()
 
