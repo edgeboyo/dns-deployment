@@ -61,8 +61,38 @@ def api_domain_details(domainName):
     try:
         domain = fetchDomain(domainName)
     except Exception as e:
-        return_error(str(e))
+        return_error(str(e), 404)
 
     domain['records'] = f'/api/domains/{domainName}/records'
 
     return return_json(domain)
+
+@app.route("/api/domains/<domainName>/records", methods=["GET"])
+def api_domain_records(domainName):
+    try:
+        domain = fetchDomain(domainName)
+    except Exception as e:
+        return_error(str(e), 404)
+
+    records = domain['records']
+
+    for type, recs in records:
+        records[type] = {"records": f"/api/domains/{domainName}/records/{type.lower()}", "amount": len(recs)}
+
+    return return_json(records)
+
+@app.route("/api/domains/<domainName>/records/<recordType>", methods=["GET"])
+def api_domain_records_specific(domainName, recordType):
+    try:
+        domain = fetchDomain(domainName)
+    except Exception as e:
+        return_error(str(e), 404)
+
+    recordType = recordType.upper()
+
+    records = domain['records']
+
+    if recordType not in records:
+        return_error(f"{recordType.upper()} is not a valid record type")
+
+    return return_json(records[recordType])
