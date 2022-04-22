@@ -72,6 +72,9 @@ def startup_checklist():
             print()
             setSSGAPath(args.ssga_path + ".exe")
             print(".exe attempt passed. Continuing with script")
+        else:
+            print("Error detected on non-NT system")
+            raise e
 
     # Check if dry run was requested
 
