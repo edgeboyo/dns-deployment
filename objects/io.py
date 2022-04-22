@@ -26,6 +26,9 @@ def setSSGAPath(path):
     while path[-1] == '\\' or path[-1] == '/':
         path = path[:-1]
 
+    if path[0] != '/' and path[0] != '\\':
+        path = './' + path
+
     if not (os.path.exists(path) and os.path.isfile(path)):
         raise Exception(f"SSGA path provided: {path} is not a valid file")
 
