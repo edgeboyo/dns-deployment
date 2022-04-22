@@ -14,4 +14,6 @@ RUN apt-get update && \
 
 RUN cd SemanticAnalyzer && make && cp ssga ..
 
+RUN python3 main.py --tcp --dry-run
+
 CMD [ "python3", "main.py", "--tcp" ]
