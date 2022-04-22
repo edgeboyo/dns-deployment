@@ -24,6 +24,9 @@ jobs:
       - name: Compile and move SSGA executable
         run: cd SemanticAnalyzer && make && mv ssga ..
 
+      - name: Check contents
+        run: ls -lsa
+
       - name: Dry run (run, check args and exit)
         run: python3 main.py --tcp --dry-run
 
