@@ -14,6 +14,7 @@ from api.api import api_startup
 
 from ArgumentParser import prepParser
 from dns.dns import createDNSServer
+from objects.domain import setTopLevelDomain
 from objects.io import setDataFolder, setSSGAPath
 
 
@@ -54,6 +55,10 @@ def startup_checklist():
     if http_port == dns_port:
         error_out(
             "To ensure interoperability the port number need to differ even if on separate protocols")
+
+    # Set the top level domain this DNS deployment manages
+
+    setTopLevelDomain(args.tld)
 
     # Select data folder and set it internally
 

@@ -5,7 +5,17 @@ from objects.io import fetchDomainFile, listDomainNames, runSSGA
 from objects.records import validateRecord, supportedRecords
 from objects.utils import stampToISO
 
-tld = "tld"  # will be imported from arguments later
+tld = None
+
+
+def setTopLevelDomain(topLevelDomain):
+    global tld
+
+    if not topLevelDomain.isalpha():
+        raise Exception(
+            f"{topLevelDomain} contains non letter chars. TLD needs to only contain chars")
+
+    tld = topLevelDomain
 
 
 def createNewDomain(domainName):
