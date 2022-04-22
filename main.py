@@ -3,7 +3,6 @@
 LICENSE http://www.apache.org/licenses/LICENSE-2.0
 """
 
-import http
 import sys
 import time
 import threading
@@ -13,6 +12,7 @@ from api.api import api_startup
 
 from ArgumentParser import prepParser
 from dns.dns import createDNSServer
+from objects.io import setDataFolder
 
 
 def error_out(message, code=2):
@@ -57,6 +57,10 @@ def startup_checklist():
         print("This configuration appears valid. Ending program due to dry run argument")
         exit()
 
+    # Select data folder and set it internally
+
+    setDataFolder(args.data_folder)
+
     return (dns_type, dns_port, http_port)
 
 
@@ -67,6 +71,8 @@ def server_startup(dns_type, dns_port, http_port):
     httpServer = threading.Thread(target=api_startup, args=(http_port, ))
     httpServer.daemon = True
     httpServer.start()
+
+    time.sleep(.5)  # to allow for cleaner output
 
     print("Starting nameserver...")
 

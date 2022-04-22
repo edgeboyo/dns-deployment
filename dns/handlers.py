@@ -60,5 +60,5 @@ def createTCPServer(dns_port):
 
 
 def createUDPServer(dns_port):
-    socketserver.ThreadingUDPServer(
+    return socketserver.ThreadingUDPServer(
         ('', dns_port), UDPRequestHandler)

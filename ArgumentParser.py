@@ -1,4 +1,5 @@
 import argparse
+from ast import parse
 
 
 def prepParser():
@@ -14,5 +15,7 @@ def prepParser():
                         help='Listen to UDP datagrams.')
     parser.add_argument('--dry-run', action="store_true",
                         help="Initialize the program, check arguments and exit immediately")
+    parser.add_argument('--data-folder', default="./data", type=str,
+                        help="Set location of DNS files being stored (default \"./data\")")
 
     return parser
