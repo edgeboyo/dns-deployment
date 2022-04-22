@@ -47,7 +47,7 @@ jobs:
         run: docker container create dns-deployment
 
   Publish:
-    # if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: Build_Image
     runs-on: ubuntu-latest
     env:
