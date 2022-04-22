@@ -8,4 +8,12 @@ RUN pip3 install -r requirements.txt
 
 COPY . .
 
+RUN apt-get update && \
+    apt-get -y install gcc make && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN cd SemanticAnalyzer && make && cp ssga ..
+
+RUN python3 main.py --tcp --dry-run
+
 CMD [ "python3", "main.py", "--tcp" ]

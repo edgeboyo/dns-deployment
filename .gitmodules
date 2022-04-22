@@ -1,0 +1,3 @@
+[submodule "SemanticAnalyzer"]
+	path = SemanticAnalyzer
+	url = https://github.com/edgeboyo/SemanticSimilarAnalyzer.git

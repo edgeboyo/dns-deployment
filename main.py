@@ -3,16 +3,19 @@
 LICENSE http://www.apache.org/licenses/LICENSE-2.0
 """
 
+import os
 import sys
 import time
 import threading
 
 import threading
+import traceback
 from api.api import api_startup
 
 from ArgumentParser import prepParser
 from dns.dns import createDNSServer
-from objects.io import setDataFolder
+from objects.domain import setTopLevelDomain
+from objects.io import setDataFolder, setSSGAPath
 
 
 def error_out(message, code=2):
@@ -53,13 +56,38 @@ def startup_checklist():
         error_out(
             "To ensure interoperability the port number need to differ even if on separate protocols")
 
-    if args.dry_run:
-        print("This configuration appears valid. Ending program due to dry run argument")
-        exit()
+    # Set the top level domain this DNS deployment manages
+
+    setTopLevelDomain(args.tld)
 
     # Select data folder and set it internally
 
     setDataFolder(args.data_folder)
+
+    # Select SSGA path, set it and check if valid
+    try:
+        setSSGAPath(args.ssga_path)
+    except Exception as e:
+        if os.name == 'nt':
+            # This is an expected error, we can skip it
+            if 'is not a valid file' not in str(e):
+                traceback.print_exc()
+            print()
+            print("------------------------------------------------------------------")
+            print("Error attempting to set SSGA path on Windows. Attempting with .exe")
+            print("------------------------------------------------------------------")
+            print()
+            setSSGAPath(args.ssga_path + ".exe")
+            print(".exe attempt passed. Continuing with script")
+        else:
+            print("Error detected on non-NT system")
+            raise e
+
+    # Check if dry run was requested
+
+    if args.dry_run:
+        print("This configuration appears valid. Ending program due to dry run argument")
+        exit()
 
     return (dns_type, dns_port, http_port)
 

@@ -1,6 +1,10 @@
 import os
+import subprocess
+from urllib import response
 
 dataFolder = None
+
+ssgaPath = None
 
 
 def setDataFolder(path):
@@ -14,6 +18,68 @@ def setDataFolder(path):
         os.mkdir(path)
 
     dataFolder = path
+
+
+def setSSGAPath(path):
+    global ssgaPath
+
+    while path[-1] == '\\' or path[-1] == '/':
+        path = path[:-1]
+
+    if path[0] != '/' and path[0] != '\\':
+        path = './' + path
+
+    if not (os.path.exists(path) and os.path.isfile(path)):
+        raise Exception(f"SSGA path provided: {path} is not a valid file")
+
+    if not os.access(path, os.X_OK):
+        raise Exception(
+            f"SSGA path provided: {path} is not an executable file")
+
+    ssgaPath = path
+
+    checkSSGA()  # this will either error out or conclude and leave
+
+
+def checkSSGA():
+
+    testString = "testing.tld"
+    knownCorrect = [574, 138, 559, 578, 253, 396, 207, 829, 581, 333]
+
+    session = subprocess.Popen(
+        [ssgaPath, testString], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, _ = session.communicate()
+
+    stdout = stdout.decode()
+
+    breakline = '\r\n' if os.name == 'nt' else '\n'
+
+    if stdout.endswith(breakline):
+        stdout = stdout[:-len(breakline)]
+
+    response = [int(line) for line in stdout.split(breakline)]
+
+    if response != knownCorrect:
+        raise Exception(
+            "SSGA generated unexpected output. Check path and executable")
+
+
+def runSSGA(uri):
+
+    session = subprocess.Popen(
+        [ssgaPath, uri], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, _ = session.communicate()
+
+    stdout = stdout.decode()
+
+    breakline = '\r\n' if os.name == 'nt' else '\n'
+
+    if stdout.endswith(breakline):
+        stdout = stdout[:-len(breakline)]
+
+    response = [int(line) for line in stdout.split(breakline)]
+
+    return response
 
 
 def fetchDomainFile(domainName, forCreation=False):

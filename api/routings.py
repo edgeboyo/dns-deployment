@@ -5,8 +5,6 @@ from objects.domain import createNewDomain, fetchAllDomainNames, fetchDomain, ov
 
 from api.returns import return_json, return_error
 
-tld = "tld"  # will be imported from config later
-
 app = Flask(__name__)
 
 
@@ -17,6 +15,7 @@ def gui_root():
 
 @app.route("/api")
 def api_root():
+    from objects.domain import tld
     data = {"documentation": "/api/docs",
             "topLevelDomain": f".{tld}", "domains": "/api/domains"}
     return return_json(data)
@@ -24,6 +23,7 @@ def api_root():
 
 @app.route("/api/domains", methods=['GET'])
 def api_domains_get():
+    from objects.domain import tld
     domains = []
     for domainName in fetchAllDomainNames():
         domain = {"domainName": domainName,
@@ -36,6 +36,7 @@ def api_domains_get():
 
 @app.route("/api/domains", methods=['POST'])
 def api_domains_post():
+    from objects.domain import tld
     if not request.is_json:
         return return_error("Data not formatted as JSON")
 
