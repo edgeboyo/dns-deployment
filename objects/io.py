@@ -64,6 +64,24 @@ def checkSSGA():
             "SSGA generated unexpected output. Check path and executable")
 
 
+def runSSGA(uri):
+
+    session = subprocess.Popen(
+        [ssgaPath, uri], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, _ = session.communicate()
+
+    stdout = stdout.decode()
+
+    breakline = '\r\n' if os.name == 'nt' else '\n'
+
+    if stdout.endswith(breakline):
+        stdout = stdout[:-len(breakline)]
+
+    response = [int(line) for line in stdout.split(breakline)]
+
+    return response
+
+
 def fetchDomainFile(domainName, forCreation=False):
     filePath = os.path.join(dataFolder, domainName + ".json")
 

@@ -1,9 +1,11 @@
 import json
 import time
 
-from objects.io import fetchDomainFile, listDomainNames
+from objects.io import fetchDomainFile, listDomainNames, runSSGA
 from objects.records import validateRecord, supportedRecords
 from objects.utils import stampToISO
+
+tld = "tld"  # will be imported from arguments later
 
 
 def createNewDomain(domainName):
@@ -13,6 +15,8 @@ def createNewDomain(domainName):
 
     for record in supportedRecords:
         domain['records'][record] = []
+
+    domain['ssgaResult'] = runSSGA(f"{domainName}.{tld}")
 
     with open(fetchDomainFile(domainName, True), "w") as f:
         json.dump(domain, f, indent=4)

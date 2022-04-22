@@ -1,11 +1,9 @@
 import traceback
 from flask import Flask, request
 
-from objects.domain import createNewDomain, fetchAllDomainNames, fetchDomain, overrideRecords
+from objects.domain import createNewDomain, fetchAllDomainNames, fetchDomain, overrideRecords, tld
 
 from api.returns import return_json, return_error
-
-tld = "tld"  # will be imported from config later
 
 app = Flask(__name__)
 
