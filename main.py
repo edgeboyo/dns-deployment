@@ -55,10 +55,6 @@ def startup_checklist():
         error_out(
             "To ensure interoperability the port number need to differ even if on separate protocols")
 
-    if args.dry_run:
-        print("This configuration appears valid. Ending program due to dry run argument")
-        exit()
-
     # Select data folder and set it internally
 
     setDataFolder(args.data_folder)
@@ -75,7 +71,13 @@ def startup_checklist():
             print("------------------------------------------------------------------")
             print()
             setSSGAPath(args.ssga_path + ".exe")
-            print(".exe attempt passed. Continueing with script")
+            print(".exe attempt passed. Continuing with script")
+
+    # Check if dry run was requested
+
+    if args.dry_run:
+        print("This configuration appears valid. Ending program due to dry run argument")
+        exit()
 
     return (dns_type, dns_port, http_port)
 
