@@ -64,7 +64,9 @@ def startup_checklist():
         setSSGAPath(args.ssga_path)
     except Exception as e:
         if os.name == 'nt':
-            traceback.print_exc()
+            # This is an expected error, we can skip it
+            if 'is not a valid file' not in str(e):
+                traceback.print_exc()
             print()
             print("------------------------------------------------------------------")
             print("Error attempting to set SSGA path on Windows. Attempting with .exe")
