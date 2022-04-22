@@ -1,0 +1,3 @@
+[submodule "ssga"]
+	path = ssga
+	url = https://github.com/edgeboyo/SemanticSimilarAnalyzer.git
