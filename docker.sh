@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# Rememeber to delete this from your final custom repo. You don't want to expose your private registory
+# Not only delete. SAFE DELETE THIS before going public
 if (( $# == 0 )) || [[ $1 == "-h" ]] || [[ $1 == "--help" ]]
 then
     echo "$0 -b/--build -c/--create -d/--deploy -h/--help"
