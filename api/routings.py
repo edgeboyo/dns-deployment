@@ -1,6 +1,6 @@
 from flask import Flask, request
 
-from objects.domain import createNewDomain, fetchAllDomainNames, fetchDomain
+from objects.domain import createNewDomain, fetchAllDomainNames, fetchDomain, overrideRecords
 
 from api.returns import return_json, return_error
 
@@ -67,6 +67,7 @@ def api_domain_details(domainName):
 
     return return_json(domain)
 
+
 @app.route("/api/domains/<domainName>/records", methods=["GET"])
 def api_domain_records(domainName):
     try:
@@ -77,9 +78,11 @@ def api_domain_records(domainName):
     records = domain['records']
 
     for type, recs in records.items():
-        records[type] = {"records": f"/api/domains/{domainName}/records/{type.lower()}", "amount": len(recs)}
+        records[type] = {
+            "records": f"/api/domains/{domainName}/records/{type.lower()}", "amount": len(recs)}
 
     return return_json(records)
+
 
 @app.route("/api/domains/<domainName>/records/<recordType>", methods=["GET"])
 def api_domain_records_specific(domainName, recordType):
@@ -93,6 +96,27 @@ def api_domain_records_specific(domainName, recordType):
     records = domain['records']
 
     if recordType not in records:
-        return_error(f"{recordType.upper()} is not a valid record type")
+        return return_error(f"{recordType.upper()} is not a valid record type")
 
     return return_json(records[recordType])
+
+
+@app.route("/api/domains/<domainName>/records/<recordType>", methods=["PUT", "PATCH"])
+def api_domain_records_change(domainName, recordType):
+    if not request.is_json:
+        return return_error("Data not formatted as JSON")
+
+    data = request.get_json()
+
+    if not isinstance(data, list):
+        return return_error("Request body must be list of records")
+
+    recordType = recordType.upper()
+
+    try:
+        # for now to PUT/PATCH the same, think of how to do it differently
+        records = overrideRecords(domainName, recordType, data)
+    except Exception as e:
+        return return_error(str(e))
+
+    return return_json(records)
