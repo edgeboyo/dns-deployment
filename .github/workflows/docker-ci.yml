@@ -7,18 +7,30 @@ on:
     branches: [main]
 
 jobs:
-  Dry_Run_and_Build:
+  Dry_Run:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+      - name: Checkout this Repository and SSGA Submodule
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       - name: Install modules (test requirements file)
         run: pip3 install -r requirements.txt
 
+      - name: Compile and move SSGA executable
+        run: cd SemanticAnalyzer && make && mv ssga ..
+
       - name: Dry run (run, check args and exit)
         run: python3 main.py --tcp --dry-run
 
+  Build_Image:
+    needs: Dry_Run
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Build the Docker image
         run: docker build --tag dns-deployment .
 
@@ -27,7 +39,7 @@ jobs:
 
   Publish:
     if: github.ref == 'refs/heads/main'
-    needs: Dry_Run_and_Build
+    needs: Build_Image
     runs-on: ubuntu-latest
     env:
       USERNAME: ${{ secrets.REPOSITORY_USERNAME }}
