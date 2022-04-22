@@ -17,5 +17,7 @@ def prepParser():
                         help="Initialize the program, check arguments and exit immediately")
     parser.add_argument('--data-folder', default="./data", type=str,
                         help="Set location of DNS files being stored (default \"./data\")")
+    parser.add_argument('--ssga-path', default="ssga", type=str,
+                        help="Set location of the semantic similarity analyzer [SSGA] (default \"ssga\" for Linux and \"ssga.exe\" for Windows)")
 
     return parser
