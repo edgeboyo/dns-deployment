@@ -40,6 +40,7 @@ def overrideRecords(domainName, recordType, records):
     with open(fetchDomainFile(domainName), "r+") as f:
         domain = json.load(f)
 
+        f.truncate(0)
         f.seek(0)
 
         domain['records'][recordType] = records

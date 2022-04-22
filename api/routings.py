@@ -1,3 +1,4 @@
+import traceback
 from flask import Flask, request
 
 from objects.domain import createNewDomain, fetchAllDomainNames, fetchDomain, overrideRecords
@@ -117,6 +118,7 @@ def api_domain_records_change(domainName, recordType):
         # for now to PUT/PATCH the same, think of how to do it differently
         records = overrideRecords(domainName, recordType, data)
     except Exception as e:
+        # traceback.print_exc()
         return return_error(str(e))
 
     return return_json(records)
