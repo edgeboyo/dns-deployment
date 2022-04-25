@@ -1,4 +1,5 @@
-from .routings import app
+from api.routings import app
+
 
 def api_startup(port=80, host='0.0.0.0', debug=False, use_reloader=False):
     print(f"Starting up HTTP server on post {port}")
