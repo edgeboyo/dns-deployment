@@ -7,13 +7,13 @@ import weakref
 
 
 class TTLCache():
-    def __init__(self, maxEntries=1000, cycleTime=10, *, name="TTLCache", maxFaults=99):
+    def __init__(self, maxEntries=1000, cycleTime=10, *, name="TTLCache", maxFaults=1):
         self.name = name  # This is for debugging purposes mostly
         # self.maxEntries = maxEntries
         self.cycleTime = cycleTime
         self.strongRefQueue = queue.PriorityQueue(maxEntries)
         self.weakRefDict = weakref.WeakValueDictionary()
-        self.maxFaults = 99
+        self.maxFaults = maxFaults
         self.faultCounter = 0
 
         thread = threading.Thread(target=self.operate)
@@ -48,6 +48,10 @@ class TTLCache():
                 traceback.print_exc()
                 if self.faultCounter < self.maxFaults:
                     print("Adding to fault counter")
+                    self.faultCounter += 1
+                else:
+                    raise Exception(
+                        f"Reached maximum amount of faults in TTL cache {self.name}")
 
     def request(self, keyword):
         try:
