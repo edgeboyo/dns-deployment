@@ -69,12 +69,14 @@ def checkHostname(address, allowBlank=True):
 #####################
 
 
-def createARecord(hostname, mapping, ttl=3600, now=time.time()):
+def createARecord(hostname, mapping, ttl=3600, now=None):
     if not isinstance(ttl, int):
         raise Exception('"ttl" filed must be of type int')
 
     if not checkHostname(hostname):
         raise Exception(f"{hostname} is not a valid hostname")
+
+    now = time.time() if now == None else now
 
     hostname = hostname.lower()
 
