@@ -9,31 +9,41 @@ import weakref
 class TTLCache():
     def __init__(self, maxEntries=1000, cycleTime=10, *, name="TTLCache", maxFaults=1):
         self.name = name  # This is for debugging purposes mostly
-        # self.maxEntries = maxEntries
         self.cycleTime = cycleTime
+
         self.strongRefQueue = queue.PriorityQueue(maxEntries)
         self.weakRefDict = weakref.WeakValueDictionary()
+
         self.maxFaults = maxFaults
         self.faultCounter = 0
+
+        self.exit_flag = False
 
         thread = threading.Thread(target=self.operate)
         thread.daemon = True
         thread.start()
 
+    def __del__(self):
+        # This will likely never be run as the operator thread has info of the cache
+        self.exit_flag = True
+
     def operate(self):
         while True:
+            if self.exit_flag:
+                print("Leaving gracefully...")
+                try:
+                    while True:
+                        # purging entries for awaiting threads
+                        self.strongRefQueue.get(timeout=.1)
+                except:
+                    return
             try:
                 ref = self.strongRefQueue.get_nowait()
-                print(ref)
                 if ref.outOfTimeCheck():
                     self.strongRefQueue.put_nowait(ref)
-                    print("Sleeping...")
                     time.sleep(self.cycleTime)
-                else:
-                    print(f"{ref} being deleted")
 
             except queue.Empty as _:
-                print("Sleeping...")
                 time.sleep(self.cycleTime)
                 continue
             except queue.Full as _:
@@ -42,12 +52,13 @@ class TTLCache():
                 thread = threading.Thread(
                     target=(lambda: self.strongRefQueue.put(ref)))
                 thread.daemon = True
-                thread.start
+                thread.start()
             except Exception as e:
                 print("TTL Queue unexpetced error...")
                 traceback.print_exc()
                 if self.faultCounter < self.maxFaults:
-                    print("Adding to fault counter")
+                    print(
+                        f"Adding to fault counter. Currently at {self.faultCounter + 1}")
                     self.faultCounter += 1
                 else:
                     raise Exception(
@@ -71,6 +82,9 @@ class TTLCache():
 
             self.strongRefQueue.put_nowait(entry)
             self.weakRefDict[keyword] = entry
+
+    def close(self):
+        self.exit_flag = True
 
 
 class Entry():
@@ -97,5 +111,4 @@ class Entry():
 
     def outOfTimeCheck(self, now=None):
         now = time.time() if now == None else now
-        print(f"[[{not self.timeOfDeath - now <= 0}]]]")
         return not self.timeOfDeath - now <= 0
