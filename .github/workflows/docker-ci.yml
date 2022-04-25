@@ -23,14 +23,24 @@ jobs:
       - name: Compile and move SSGA executable
         run: cd SemanticAnalyzer && make && mv ssga ..
 
-      - name: Check contents
-        run: ls -lsa
-
       - name: Dry run (run, check args and exit)
         run: python3 main.py --tcp --dry-run
 
+  Test:
+    - name: Checkout this Repository and SSGA Submodule
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        submodules: recursive
+
+    - name: Install Python modules
+      run: pip3 install -r requirements.txt
+
+    - name: Run Python Unit Tests
+      run: pytest .
+
   Build_Image:
-    needs: Dry_Run
+    needs: Test
     runs-on: ubuntu-latest
 
     steps:
