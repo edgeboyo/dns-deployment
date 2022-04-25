@@ -99,23 +99,3 @@ class Entry():
         now = time.time() if now == None else now
         print(f"[[{not self.timeOfDeath - now <= 0}]]]")
         return not self.timeOfDeath - now <= 0
-
-
-if __name__ == "__main__":
-    print('Keep in mind this test will take ~ a minute')
-
-    cache = TTLCache(cycleTime=5, name="TesterCache")
-    values = list(range(0, 100))
-
-    ttl = 55
-
-    for val in values:
-        cache.place(str(val), val, ttl)
-
-    time.sleep(30)
-
-    print(cache.request('5'))
-
-    time.sleep(35)
-
-    print(cache.request('5'))
