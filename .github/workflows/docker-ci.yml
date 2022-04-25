@@ -42,7 +42,7 @@ jobs:
       run: pytest .
 
   Build_Image:
-    needs: Test
+    needs: [Dry_Run, Test]
     runs-on: ubuntu-latest
 
     steps:
