@@ -24,6 +24,13 @@ def getTLD():
 
 def createNewDomain(domainName):
     now = time.time()
+
+    allowedInDomainName = [chr(c)
+                           for c in range(ord('a'), ord('z') + 1)] + ['-']
+    if domainName[0] == '-' or domainName[-1] == '-' or any(map(lambda c: c not in allowedInDomainName, domainName)):
+        raise Exception(
+            f"Domain name {domainName} contains invalid characters or has a '-' char on either end")
+
     domain = {"domainName": domainName, "records": {},
               "registeredAt": stampToISO(now)}
 
