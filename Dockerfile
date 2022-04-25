@@ -16,6 +16,4 @@ RUN cd SemanticAnalyzer && make && cp ssga ..
 
 RUN python3 main.py --tcp --dry-run
 
-RUN apt-get purge gcc make -y
-
 CMD [ "python3", "main.py", "--tcp" ]
