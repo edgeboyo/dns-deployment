@@ -1,5 +1,5 @@
 
-from .handlers import createTCPServer, createUDPServer
+from dns.handlers import createTCPServer, createUDPServer
 import threading
 
 
