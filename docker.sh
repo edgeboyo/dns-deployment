@@ -20,7 +20,7 @@ do
         docker build --tag dns-deployment .
     elif [[ $var == '-c' ]] || [[ $var == '--create' ]] 
     then
-        docker container create dns-deployment
+        docker run -p 80:80 dns-deployment
     elif [[ $var == '-d' ]] || [[ $var == '--deploy' ]]
     then
         docker tag dns-deployment registry.digitalocean.com/part3-project/dns-deployment
