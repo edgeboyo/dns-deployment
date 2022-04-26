@@ -43,9 +43,8 @@ class TTLCache():
 
 def operate(weakRef):
     while True:
-        cache = weakRef()  # create strong reference
+        cache: TTLCache = weakRef()  # create strong reference
         if not cache:
-            print("Leaving gracefully...")
             return
         try:
             ref = cache.strongRefQueue.get_nowait()

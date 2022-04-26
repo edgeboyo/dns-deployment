@@ -105,8 +105,6 @@ def test_destruction():
 
     del cache
 
-    print("Deleted...")
-
     time.sleep(2)  # to ensure the cleaner thread dies out
 
     assert ref() == None
