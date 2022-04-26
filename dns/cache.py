@@ -17,15 +17,9 @@ class TTLCache():
         self.maxFaults = maxFaults
         self.faultCounter = 0
 
-        self.exit_flag = False
-
         thread = threading.Thread(target=operate, args=(weakref.ref(self), ))
         thread.daemon = True
         thread.start()
-
-    def __del__(self):
-        # This will likely never be run as the operator thread has info of the cache
-        self.exit_flag = True
 
     def request(self, keyword):
         try:
@@ -45,9 +39,6 @@ class TTLCache():
 
             self.strongRefQueue.put_nowait(entry)
             self.weakRefDict[keyword] = entry
-
-    def close(self):
-        self.exit_flag = True
 
 
 def operate(weakRef):
