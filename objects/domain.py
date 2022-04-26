@@ -73,3 +73,7 @@ def overrideRecords(domainName, recordType, records):
         json.dump(domain, f, indent=4)
 
     return records
+
+
+def checkTLD(domainName: str):
+    return domainName.endswith("." + getTLD()) or domainName.endswith("." + getTLD() + ".")

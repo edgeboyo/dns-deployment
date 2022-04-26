@@ -1,5 +1,7 @@
 from dnslib import *
 
+from objects.domain import checkTLD
+
 # All of this needs to go and has to fetch data from flat files in the data files
 
 
@@ -46,6 +48,12 @@ def dns_response(data):
     qn = str(qname)
     qtype = request.q.qtype
     qt = QTYPE[qtype]
+
+    if checkTLD(qn):
+        # Our TLD
+        pass
+    else:
+        raise Exception("Reroute required. Functionality not yet implemented")
 
     if qn == D or qn.endswith('.' + D):
 
