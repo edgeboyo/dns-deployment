@@ -69,7 +69,7 @@ def checkHostname(address, allowBlank=True):
 #####################
 
 
-def createARecord(hostname, mapping, ttl=3600, now=time.time()):
+def createARecord(hostname, mapping, ttl=3600, now=None):
     if not isinstance(ttl, int):
         raise Exception('"ttl" filed must be of type int')
 
@@ -77,6 +77,8 @@ def createARecord(hostname, mapping, ttl=3600, now=time.time()):
         raise Exception(f"{hostname} is not a valid hostname")
 
     hostname = hostname.lower()
+
+    now = time.time() if now == None else now
 
     if not checkIfIP(mapping, "IPv4"):
         raise Exception(f"{mapping} is not an IPv4 address as it should be")
@@ -89,7 +91,7 @@ def createARecord(hostname, mapping, ttl=3600, now=time.time()):
     return record
 
 
-def createAAAARecord(hostname, mapping, ttl=3600, now=time.time()):
+def createAAAARecord(hostname, mapping, ttl=3600, now=None):
     if not isinstance(ttl, int):
         raise Exception('"ttl" filed must be of type int')
 
@@ -97,6 +99,8 @@ def createAAAARecord(hostname, mapping, ttl=3600, now=time.time()):
         raise Exception(f"{hostname} is not a valid hostname")
 
     hostname = hostname.lower()
+
+    now = time.time() if now == None else now
 
     if not checkIfIP(mapping, "IPv6"):
         raise Exception(f"{mapping} is not an IPv6 address as it should be")
@@ -109,7 +113,7 @@ def createAAAARecord(hostname, mapping, ttl=3600, now=time.time()):
     return record
 
 
-def createTXTRecord(hostname, value, ttl=3600, now=time.time()):
+def createTXTRecord(hostname, value, ttl=3600, now=None):
     if not isinstance(ttl, int):
         raise Exception('"ttl" filed must be of type int')
 
@@ -117,6 +121,8 @@ def createTXTRecord(hostname, value, ttl=3600, now=time.time()):
         raise Exception(f"{hostname} is not a valid hostname")
 
     hostname = hostname.lower()
+
+    now = time.time() if now == None else now
 
     record = {'record': hostname, "value": value,
               "ttl": ttl, "setAt": stampToISO(now)}
