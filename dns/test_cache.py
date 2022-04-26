@@ -1,5 +1,6 @@
 import queue
 import time
+import weakref
 import pytest
 
 from dns.cache import TTLCache
@@ -94,3 +95,18 @@ def test_polling_replacer():
     time.sleep(5)
 
     assert cache.request('A')[1]  # value returned by safety thread
+
+
+def test_destruction():
+    cacheName = "TestName"
+    cache = TTLCache(cycleTime=1, name=cacheName)
+
+    ref = weakref.ref(cache)
+
+    del cache
+
+    print("Deleted...")
+
+    time.sleep(2)  # to ensure the cleaner thread dies out
+
+    assert ref() == None
