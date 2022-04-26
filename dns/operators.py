@@ -1,6 +1,6 @@
 from dnslib import *
 
-from objects.domain import checkTLD
+from objects.domain import checkTLD, requestRecords
 
 # All of this needs to go and has to fetch data from flat files in the data files
 
@@ -50,8 +50,8 @@ def dns_response(data):
     qt = QTYPE[qtype]
 
     if checkTLD(qn):
-        # Our TLD
-        pass
+        records = requestRecords(qn)
+        print(records)
     else:
         raise Exception("Reroute required. Functionality not yet implemented")
 

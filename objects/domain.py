@@ -76,4 +76,27 @@ def overrideRecords(domainName, recordType, records):
 
 
 def checkTLD(domainName: str):
-    return domainName.endswith("." + getTLD()) or domainName.endswith("." + getTLD() + ".")
+    return domainName.endswith("." + getTLD()) or domainName.endswith("." + tld + ".")
+
+
+def requestRecords(domainName: str):
+    segments = domainName.split(".")
+
+    encounteredTLD = False
+    secondLevel = None
+    for segment in reversed(segments):
+        if len(segment) == 0:
+            continue
+
+        if not encounteredTLD and segment == tld:
+            encounteredTLD = True
+            continue
+
+        secondLevel = segment
+
+    if secondLevel == None:
+        return {}
+
+    domain = fetchDomain(secondLevel)
+
+    return domain['records']
