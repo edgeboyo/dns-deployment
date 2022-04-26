@@ -29,16 +29,15 @@ def startup_checklist():
     args = parser.parse_args()
 
     # Select DNS server type (TCP/UDP)
-    dns_type = None
+    dns_type = ""
 
-    if args.tcp and args.udp:
-        error_out("Currently cannot run both server types at the same time")
-    elif args.tcp:
-        dns_type = "TCP"
-    elif args.udp:
-        dns_type = "UDP"
-    else:
-        error_out("Either --tcp or --udp are required")
+    if args.tcp:
+        dns_type += "TCP"
+    if args.udp:
+        dns_type += "UDP"
+
+    if dns_type == "":
+        error_out("Either --tcp or --udp or both are required")
 
     # Select DNS server port and check if valid
     dns_port = args.dns_port
