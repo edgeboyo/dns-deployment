@@ -19,50 +19,13 @@ class TTLCache():
 
         self.exit_flag = False
 
-        thread = threading.Thread(target=self.operate)
+        thread = threading.Thread(target=operate, args=(weakref.ref(self), ))
         thread.daemon = True
         thread.start()
 
     def __del__(self):
         # This will likely never be run as the operator thread has info of the cache
         self.exit_flag = True
-
-    def operate(self):
-        while True:
-            if self.exit_flag:
-                print("Leaving gracefully...")
-                try:
-                    while True:
-                        # purging entries for awaiting threads
-                        self.strongRefQueue.get(timeout=.1)
-                except:
-                    return
-            try:
-                ref = self.strongRefQueue.get_nowait()
-                if ref.outOfTimeCheck():
-                    self.strongRefQueue.put_nowait(ref)
-                    time.sleep(self.cycleTime)
-
-            except queue.Empty as _:
-                time.sleep(self.cycleTime)
-                continue
-            except queue.Full as _:
-                # This is done in case of a full error on the outOfTimeCheck. There is no way to peek onto the top of the queue
-                # So there is a chance it would get overridden in this time. As such it's better allow this be done via a block
-                thread = threading.Thread(
-                    target=(lambda: self.strongRefQueue.put(ref)))
-                thread.daemon = True
-                thread.start()
-            except Exception as e:
-                print("TTL Queue unexpetced error...")
-                traceback.print_exc()
-                if self.faultCounter < self.maxFaults:
-                    print(
-                        f"Adding to fault counter. Currently at {self.faultCounter + 1}")
-                    self.faultCounter += 1
-                else:
-                    raise Exception(
-                        f"Reached maximum amount of faults in TTL cache {self.name}")
 
     def request(self, keyword):
         try:
@@ -85,6 +48,44 @@ class TTLCache():
 
     def close(self):
         self.exit_flag = True
+
+
+def operate(weakRef):
+    while True:
+        cache = weakRef()  # create strong reference
+        if not cache:
+            print("Leaving gracefully...")
+            return
+        try:
+            ref = cache.strongRefQueue.get_nowait()
+            if ref.outOfTimeCheck():
+                cache.strongRefQueue.put_nowait(ref)
+                time.sleep(cache.cycleTime)
+
+        except queue.Empty as _:
+            time.sleep(cache.cycleTime)
+        except queue.Full as _:
+            # This is done in case of a full error on the outOfTimeCheck. There is no way to peek onto the top of the queue
+            # So there is a chance it would get overridden in this time. As such it's better allow this be done via a block
+            strongRefQueue = cache.strongRefQueue
+            thread = threading.Thread(
+                target=(lambda: strongRefQueue.put(ref)))
+            thread.daemon = True
+            thread.start()
+        except Exception as e:
+            if cache == None:
+                return  # leaving
+            print("TTL Queue unexpetced error...")
+            traceback.print_exc()
+            if cache.faultCounter < cache.maxFaults:
+                print(
+                    f"Adding to fault counter. Currently at {cache.faultCounter + 1}")
+                cache.faultCounter += 1
+            else:
+                raise Exception(
+                    f"Reached maximum amount of faults in TTL cache {cache.name}")
+
+        del cache  # remove strong reference
 
 
 class Entry():
