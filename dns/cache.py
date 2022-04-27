@@ -41,7 +41,7 @@ class TTLCache():
             self.weakRefDict[keyword] = entry
 
 
-def operate(weakRef):
+def operate(weakRef):  # This is an internal command. It needs to be outside of the class to allow the garbage collector to remove itself safely
     while True:
         cache: TTLCache = weakRef()  # create strong reference
         if not cache:
