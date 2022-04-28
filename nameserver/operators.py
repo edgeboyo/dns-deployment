@@ -1,7 +1,7 @@
 import re
 from dnslib import *
 import dns.resolver
-
+from dns.message import from_wire
 from objects.domain import checkTLD, requestRecords
 
 # All of this needs to go and has to fetch data from flat files in the data files
@@ -73,6 +73,8 @@ def prep_regex(domainName):
 
 
 def dns_response(data):
+    print(data)
+    from_wire(data)
     request = DNSRecord.parse(data)
 
     print(request)
