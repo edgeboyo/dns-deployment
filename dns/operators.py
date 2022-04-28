@@ -79,7 +79,6 @@ def dns_response(data):
     # All of this stuff might get thrown out
     for name, rss in records.items():
         regex = prep_regex(name)
-        print(bool(re.match(regex, qn)))
         if re.match(regex, qn):
             for domainInfo in rss:
                 (rdata, _, TTL) = domainInfo
