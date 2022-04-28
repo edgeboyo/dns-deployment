@@ -1,6 +1,8 @@
-from audioop import add
+from inspect import trace
 import time
-
+import traceback
+from dnslib import *
+# from objects.domain import getTLD
 from objects.utils import stampToISO
 
 ##################
@@ -69,7 +71,7 @@ def checkHostname(address, allowBlank=True):
 #####################
 
 
-def createARecord(hostname, mapping, ttl=3600, now=time.time()):
+def createARecord(hostname, mapping, ttl=3600, now=None):
     if not isinstance(ttl, int):
         raise Exception('"ttl" filed must be of type int')
 
@@ -77,6 +79,8 @@ def createARecord(hostname, mapping, ttl=3600, now=time.time()):
         raise Exception(f"{hostname} is not a valid hostname")
 
     hostname = hostname.lower()
+
+    now = time.time() if now == None else now
 
     if not checkIfIP(mapping, "IPv4"):
         raise Exception(f"{mapping} is not an IPv4 address as it should be")
@@ -89,7 +93,7 @@ def createARecord(hostname, mapping, ttl=3600, now=time.time()):
     return record
 
 
-def createAAAARecord(hostname, mapping, ttl=3600, now=time.time()):
+def createAAAARecord(hostname, mapping, ttl=3600, now=None):
     if not isinstance(ttl, int):
         raise Exception('"ttl" filed must be of type int')
 
@@ -97,6 +101,8 @@ def createAAAARecord(hostname, mapping, ttl=3600, now=time.time()):
         raise Exception(f"{hostname} is not a valid hostname")
 
     hostname = hostname.lower()
+
+    now = time.time() if now == None else now
 
     if not checkIfIP(mapping, "IPv6"):
         raise Exception(f"{mapping} is not an IPv6 address as it should be")
@@ -109,7 +115,7 @@ def createAAAARecord(hostname, mapping, ttl=3600, now=time.time()):
     return record
 
 
-def createTXTRecord(hostname, value, ttl=3600, now=time.time()):
+def createTXTRecord(hostname, value, ttl=3600, now=None):
     if not isinstance(ttl, int):
         raise Exception('"ttl" filed must be of type int')
 
@@ -118,10 +124,24 @@ def createTXTRecord(hostname, value, ttl=3600, now=time.time()):
 
     hostname = hostname.lower()
 
+    now = time.time() if now == None else now
+
     record = {'record': hostname, "value": value,
               "ttl": ttl, "setAt": stampToISO(now)}
 
     return record
+
+######################
+# RECORD TRANSLATORS #
+######################
+
+
+def interpretARecord(record, mapping, ttl, setAt, secondLevelDomain, tld):
+
+    domainName = f"{secondLevelDomain}.{tld}." if record == "@" else f"{record}.{secondLevelDomain}.{tld}"
+
+    return (A(mapping), domainName, ttl)
+
 
 ###################################
 # IMPORTABLE FUNCTIONS AND VALUES #
@@ -130,6 +150,8 @@ def createTXTRecord(hostname, value, ttl=3600, now=time.time()):
 
 recordMappings = {'A': createARecord,
                   'AAAA': createAAAARecord, 'TXT': createTXTRecord}
+
+recordInterpreter = {'A': interpretARecord}
 
 supportedRecords = list(recordMappings.keys())
 
@@ -154,3 +176,23 @@ def validateRecord(recordType, records):
         raise Exception(e)
 
     return transformedRecords
+
+
+def interpretRecord(records, secondLevelDomain, tld):
+    interpretedRecords = {}
+    try:
+        for recordType, records in records.items():
+            for record in records:
+                interpreter = recordInterpreter[recordType]
+                record = interpreter(
+                    **record, secondLevelDomain=secondLevelDomain, tld=tld)
+                domainName = record[1]
+                if domainName not in interpretedRecords:
+                    interpretedRecords[domainName] = []
+                interpretedRecords[domainName].append(record)
+    except:
+        print(f"Error parsing record of {secondLevelDomain}")
+        traceback.print_exc()
+        print(f"Record dump {record}")
+
+    return interpretedRecords

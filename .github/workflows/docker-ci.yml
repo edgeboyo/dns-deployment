@@ -29,17 +29,17 @@ jobs:
   Test:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout this Repository and SSGA Submodule
-      uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        submodules: recursive
+      - name: Checkout this Repository and SSGA Submodule
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          submodules: recursive
 
-    - name: Install Python modules
-      run: pip3 install -r requirements.txt
+      - name: Install Python modules
+        run: pip3 install -r requirements.txt
 
-    - name: Run Python Unit Tests
-      run: pytest .
+      - name: Run Python Unit Tests
+        run: pytest .
 
   Build_Image:
     needs: [Dry_Run, Test]
@@ -55,8 +55,8 @@ jobs:
       - name: Build the Docker image
         run: docker build --tag dns-deployment .
 
-      - name: Create docker container from image
-        run: docker container create dns-deployment
+      - name: Create and run docker container from image
+        run: docker run -d -p 127.0.0.1:80:80 -p 127.0.0.1:53:53/tcp -p 127.0.0.1:53:53/udp dns-deployment
 
   Publish:
     if: github.ref == 'refs/heads/main'
