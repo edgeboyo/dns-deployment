@@ -1,6 +1,6 @@
 import re
 from dnslib import *
-
+import dns.resolver
 
 from objects.domain import checkTLD, requestRecords
 
