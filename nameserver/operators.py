@@ -90,7 +90,13 @@ def dns_response(data):
         # records = interpretRecord(records)
         print(records)
     else:
-        raise Exception("Reroute required. Functionality not yet implemented")
+        answer = resolver.resolve(qn, qt)
+        print(answer.response)
+        name = str(answer.qname)
+        records = {name: []}
+        for a in answer:
+            # print(type(a))
+            records[name].append((A(str(a)), None, answer.rrset.ttl))
 
     # All of this stuff might get thrown out
     for name, rss in records.items():
