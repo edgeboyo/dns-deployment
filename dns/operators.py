@@ -62,23 +62,27 @@ def dns_response(data):
         raise Exception("Reroute required. Functionality not yet implemented")
 
     # All of this stuff might get thrown out
-    if qn == D or qn.endswith('.' + D):
-        for name, domainInfo in records.items():
-            (rrs, _, TTL) = domainInfo
-            if re.match(name, qn):
-                for rdata in rrs:
-                    rqt = rdata.__class__.__name__
-                    if qt in ['*', rqt]:
-                        reply.add_answer(RR(rname=qname, rtype=getattr(
-                            QTYPE, rqt), rclass=1, ttl=TTL, rdata=rdata))
+    for name, rss in records.items():
+        print(re.match(name, qn))
+        if re.match(name, qn):
+            for domainInfo in rss:
+                (rdata, _, TTL) = domainInfo
+                rqt = rdata.__class__.__name__
+                if qt in ['*', rqt]:
+                    reply.add_answer(RR(rname=qname, rtype=getattr(
+                        QTYPE, rqt), rclass=1, ttl=TTL, rdata=rdata))
 
-        for rdata in ns_records:
-            reply.add_ar(RR(rname=D, rtype=QTYPE.NS,
-                         rclass=1, ttl=TTL, rdata=rdata))
+    return reply.pack()
+    # This code here is for NS and auth records. Since we don't use it now it will be omitted
+    """
+    for rdata in ns_records:
+        reply.add_ar(RR(rname=D, rtype=QTYPE.NS,
+                        rclass=1, ttl=TTL, rdata=rdata))
 
-        reply.add_auth(RR(rname=D, rtype=QTYPE.SOA,
-                       rclass=1, ttl=TTL, rdata=soa_record))
+    reply.add_auth(RR(rname=D, rtype=QTYPE.SOA,
+                      rclass=1, ttl=TTL, rdata=soa_record))
 
     print("---- Reply:\n", reply)
 
     return reply.pack()
+    """
