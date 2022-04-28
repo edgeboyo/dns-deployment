@@ -18,4 +18,4 @@ RUN cd SemanticAnalyzer && make && cp ssga ..
 
 RUN python3 main.py --tcp --dry-run
 
-CMD [ "python3", "main.py", "--tcp" ]
+CMD [ "python3", "main.py", "--tcp", "--udp" ]
