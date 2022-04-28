@@ -1,6 +1,7 @@
 import re
 from dnslib import *
 
+
 from objects.domain import checkTLD, requestRecords
 
 # All of this needs to go and has to fetch data from flat files in the data files
@@ -35,6 +36,21 @@ records = {
     D.mail: [A(IP)],
     D.andrei: [CNAME(D)],
 }
+
+resolver = None
+
+
+def setResolver(nameServer):
+    global resolver
+
+    resolver = dns.resolver.Resolver()
+    resolver.nameservers = [nameServer]
+
+    try:
+        resolver.resolve("google.com")
+    except:
+        sys.exc_clear()
+        raise Exception("Could not fetch Google.com. Fallback DNS invalid")
 
 
 def interpret_local_records(records):
