@@ -1,3 +1,4 @@
+import re
 from dnslib import *
 
 from objects.domain import checkTLD, requestRecords
@@ -36,6 +37,10 @@ records = {
 }
 
 
+def interpret_local_records(records):
+    pass
+
+
 def dns_response(data):
     request = DNSRecord.parse(data)
 
@@ -51,14 +56,16 @@ def dns_response(data):
 
     if checkTLD(qn):
         records = requestRecords(qn)
+        # records = interpretRecord(records)
         print(records)
     else:
         raise Exception("Reroute required. Functionality not yet implemented")
 
+    # All of this stuff might get thrown out
     if qn == D or qn.endswith('.' + D):
-
-        for name, rrs in records.items():
-            if name == qn:
+        for name, domainInfo in records.items():
+            (rrs, _, TTL) = domainInfo
+            if re.match(name, qn):
                 for rdata in rrs:
                     rqt = rdata.__class__.__name__
                     if qt in ['*', rqt]:

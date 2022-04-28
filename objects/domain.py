@@ -2,7 +2,7 @@ import json
 import time
 
 from objects.io import fetchDomainFile, listDomainNames, runSSGA
-from objects.records import validateRecord, supportedRecords
+from objects.records import interpretRecord, validateRecord, supportedRecords
 from objects.utils import stampToISO
 
 tld = None  # if this provided None if imported use, getTLD
@@ -99,4 +99,6 @@ def requestRecords(domainName: str):
 
     domain = fetchDomain(secondLevel)
 
-    return domain['records']
+    records = interpretRecord(domain['records'], secondLevel, tld)
+
+    return records
