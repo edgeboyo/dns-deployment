@@ -2,7 +2,7 @@ import json
 import time
 
 from objects.io import fetchDomainFile, listDomainNames, runSSGA
-from objects.records import validateRecord, supportedRecords
+from objects.records import interpretRecord, validateRecord, supportedRecords
 from objects.utils import stampToISO
 
 tld = None  # if this provided None if imported use, getTLD
@@ -71,5 +71,37 @@ def overrideRecords(domainName, recordType, records):
         domain['records'][recordType] = records
 
         json.dump(domain, f, indent=4)
+
+    return records
+
+
+def checkTLD(domainName: str):
+    return domainName.endswith("." + getTLD()) or domainName.endswith("." + tld + ".")
+
+
+def requestRecords(domainName: str):
+    segments = domainName.split(".")
+
+    encounteredTLD = False
+    secondLevel = None
+    for segment in reversed(segments):
+        if len(segment) == 0:
+            continue
+
+        if not encounteredTLD and segment == tld:
+            encounteredTLD = True
+            continue
+
+        secondLevel = segment
+        break
+
+    if secondLevel == None:
+        return {}
+
+    print(secondLevel)
+
+    domain = fetchDomain(secondLevel)
+
+    records = interpretRecord(domain['records'], secondLevel, tld)
 
     return records

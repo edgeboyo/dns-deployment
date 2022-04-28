@@ -1,4 +1,7 @@
+import re
 from dnslib import *
+
+from objects.domain import checkTLD, requestRecords
 
 # All of this needs to go and has to fetch data from flat files in the data files
 
@@ -34,6 +37,25 @@ records = {
 }
 
 
+def interpret_local_records(records):
+    pass
+
+
+def prep_regex(domainName):
+    regex = ""
+
+    for c in domainName:
+        if c == "*":
+            c = "." + c
+
+        if c == ".":
+            c = "\\" + c
+
+        regex += c
+
+    return regex
+
+
 def dns_response(data):
     request = DNSRecord.parse(data)
 
@@ -47,22 +69,32 @@ def dns_response(data):
     qtype = request.q.qtype
     qt = QTYPE[qtype]
 
-    if qn == D or qn.endswith('.' + D):
+    if checkTLD(qn):
+        records = requestRecords(qn)
+        # records = interpretRecord(records)
+        print(records)
+    else:
+        raise Exception("Reroute required. Functionality not yet implemented")
 
-        for name, rrs in records.items():
-            if name == qn:
-                for rdata in rrs:
-                    rqt = rdata.__class__.__name__
-                    if qt in ['*', rqt]:
-                        reply.add_answer(RR(rname=qname, rtype=getattr(
-                            QTYPE, rqt), rclass=1, ttl=TTL, rdata=rdata))
+    # All of this stuff might get thrown out
+    for name, rss in records.items():
+        regex = prep_regex(name)
+        if re.match(regex, qn):
+            for domainInfo in rss:
+                (rdata, _, TTL) = domainInfo
+                rqt = rdata.__class__.__name__
+                if qt in ['*', rqt]:
+                    reply.add_answer(RR(rname=qname, rtype=getattr(
+                        QTYPE, rqt), rclass=1, ttl=TTL, rdata=rdata))
 
-        for rdata in ns_records:
-            reply.add_ar(RR(rname=D, rtype=QTYPE.NS,
-                         rclass=1, ttl=TTL, rdata=rdata))
+    # This code here is for NS and auth records. Since we don't use it now it should be omitted
+    # Will be addressed later
+    for rdata in ns_records:
+        reply.add_ar(RR(rname=D, rtype=QTYPE.NS,
+                        rclass=1, ttl=TTL, rdata=rdata))
 
-        reply.add_auth(RR(rname=D, rtype=QTYPE.SOA,
-                       rclass=1, ttl=TTL, rdata=soa_record))
+    reply.add_auth(RR(rname=D, rtype=QTYPE.SOA,
+                      rclass=1, ttl=TTL, rdata=soa_record))
 
     print("---- Reply:\n", reply)
 

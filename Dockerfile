@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM python:3.8-slim-buster
 
+EXPOSE 53/tcp 53/udp 80
+
 WORKDIR /app
 
 COPY requirements.txt requirements.txt
@@ -16,4 +18,4 @@ RUN cd SemanticAnalyzer && make && cp ssga ..
 
 RUN python3 main.py --tcp --dry-run
 
-CMD [ "python3", "main.py", "--tcp" ]
+CMD [ "python3", "main.py", "--tcp", "--udp" ]
