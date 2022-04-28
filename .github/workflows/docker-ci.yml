@@ -56,7 +56,7 @@ jobs:
         run: docker build --tag dns-deployment .
 
       - name: Create and run docker container from image
-        run: docker run -d -p 127.0.0.1:80:80 -p 127.0.0.1:53:53/tcp -p 127.0.0.1:53:53/udp dns-deployment
+        run: docker run -d -p 80:80 -p 53:53/tcp -p 53:53/udp dns-deployment
 
   Publish:
     if: github.ref == 'refs/heads/main'
