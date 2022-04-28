@@ -41,6 +41,21 @@ def interpret_local_records(records):
     pass
 
 
+def prep_regex(domainName):
+    regex = ""
+
+    for c in domainName:
+        if c == "*":
+            c = "." + c
+
+        if c == ".":
+            c = "\\" + c
+
+        regex += c
+
+    return regex
+
+
 def dns_response(data):
     request = DNSRecord.parse(data)
 
@@ -63,8 +78,9 @@ def dns_response(data):
 
     # All of this stuff might get thrown out
     for name, rss in records.items():
-        print(re.match(name, qn))
-        if re.match(name, qn):
+        regex = prep_regex(name)
+        print(bool(re.match(regex, qn)))
+        if re.match(regex, qn):
             for domainInfo in rss:
                 (rdata, _, TTL) = domainInfo
                 rqt = rdata.__class__.__name__
@@ -72,9 +88,8 @@ def dns_response(data):
                     reply.add_answer(RR(rname=qname, rtype=getattr(
                         QTYPE, rqt), rclass=1, ttl=TTL, rdata=rdata))
 
-    return reply.pack()
-    # This code here is for NS and auth records. Since we don't use it now it will be omitted
-    """
+    # This code here is for NS and auth records. Since we don't use it now it should be omitted
+    # Will be addressed later
     for rdata in ns_records:
         reply.add_ar(RR(rname=D, rtype=QTYPE.NS,
                         rclass=1, ttl=TTL, rdata=rdata))
@@ -85,4 +100,3 @@ def dns_response(data):
     print("---- Reply:\n", reply)
 
     return reply.pack()
-    """

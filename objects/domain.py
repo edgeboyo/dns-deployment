@@ -93,9 +93,12 @@ def requestRecords(domainName: str):
             continue
 
         secondLevel = segment
+        break
 
     if secondLevel == None:
         return {}
+
+    print(secondLevel)
 
     domain = fetchDomain(secondLevel)
 
