@@ -25,6 +25,9 @@ do
     then
         docker tag dns-deployment registry.digitalocean.com/part3-project/dns-deployment
         docker push registry.digitalocean.com/part3-project/dns-deployment
+    elif [[ $var == '-d' ]] || [[ $var == '--deploy' ]]
+        docker pull registry.digitalocean.com/part3-project/dns-deployment
+        docker tag registry.digitalocean.com/part3-project/dns-deployment dns-deployment:latest 
     else
         echo "Unknown command: $var"
         echo "Check usage..."
