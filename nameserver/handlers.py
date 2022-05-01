@@ -4,7 +4,7 @@ import traceback
 import struct
 import sys
 
-from dns.operators import dns_response
+from nameserver.operators import dns_response
 
 # These handleres make extensive use of an Open Source gist by pklaus on GitHub - https://gist.github.com/pklaus/b5a7876d4d2cf7271873
 

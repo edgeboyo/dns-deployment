@@ -4,6 +4,7 @@ autopep8==1.6.0
 click==8.1.2
 colorama==0.4.4
 dnslib==0.9.19
+dnspython==2.2.1
 Flask==2.1.1
 importlib-metadata==4.11.3
 iniconfig==1.1.1

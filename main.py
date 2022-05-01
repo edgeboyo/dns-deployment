@@ -13,7 +13,8 @@ import traceback
 from api.api import api_startup
 
 from ArgumentParser import prepParser
-from dns.dns import createDNSServer
+from nameserver.dns import createDNSServer
+from nameserver.operators import setResolver
 from objects.domain import setTopLevelDomain
 from objects.io import setDataFolder, setSSGAPath
 
@@ -62,6 +63,10 @@ def startup_checklist():
     # Select data folder and set it internally
 
     setDataFolder(args.data_folder)
+
+    # Select a fallback DNS servive for unknown TLDs
+
+    setResolver(args.fallback_dns)
 
     # Select SSGA path, set it and check if valid
     try:

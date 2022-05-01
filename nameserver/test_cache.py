@@ -3,7 +3,7 @@ import time
 import weakref
 import pytest
 
-from dns.cache import TTLCache
+from nameserver.cache import TTLCache
 
 
 def test_simple_queue():

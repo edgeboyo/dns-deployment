@@ -1,5 +1,4 @@
 import argparse
-from ast import parse
 
 
 def prepParser():
@@ -21,5 +20,7 @@ def prepParser():
                         help='Prepare a UDP DNS server')
     parser.add_argument('--dry-run', action="store_true",
                         help="Initialize the program, check arguments and exit immediately")
+    parser.add_argument('--fallback-dns', default="1.1.1.1", type=str,
+                        help="Address to a DNS used as authority when the domain requested is not under this server")
 
     return parser

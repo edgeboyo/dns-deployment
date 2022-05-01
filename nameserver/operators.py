@@ -1,6 +1,7 @@
 import re
 from dnslib import *
-
+import dns.resolver
+from dns.message import from_wire
 from objects.domain import checkTLD, requestRecords
 
 # All of this needs to go and has to fetch data from flat files in the data files
@@ -36,6 +37,20 @@ records = {
     D.andrei: [CNAME(D)],
 }
 
+resolver = None
+
+
+def setResolver(nameServer):
+    global resolver
+
+    resolver = dns.resolver.Resolver()
+    resolver.nameservers = [nameServer]
+
+    try:
+        resolver.resolve("google.com")
+    except:
+        raise Exception("Could not fetch Google.com. Fallback DNS invalid")
+
 
 def interpret_local_records(records):
     pass
@@ -57,6 +72,7 @@ def prep_regex(domainName):
 
 
 def dns_response(data):
+    request = from_wire(data)
     request = DNSRecord.parse(data)
 
     print(request)
@@ -74,7 +90,13 @@ def dns_response(data):
         # records = interpretRecord(records)
         print(records)
     else:
-        raise Exception("Reroute required. Functionality not yet implemented")
+        answer = resolver.resolve(qn, qt)
+        print(answer.response)
+        name = str(answer.qname)
+        records = {name: []}
+        for a in answer:
+            # print(type(a))
+            records[name].append((A(str(a)), None, answer.rrset.ttl))
 
     # All of this stuff might get thrown out
     for name, rss in records.items():
