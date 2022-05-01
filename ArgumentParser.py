@@ -22,5 +22,11 @@ def prepParser():
                         help="Initialize the program, check arguments and exit immediately")
     parser.add_argument('--fallback-dns', default="1.1.1.1", type=str,
                         help="Address to a DNS used as authority when the domain requested is not under this server")
+    parser.add_argument('--no-metrics', action='store_true',
+                        help="Allow for the deployment to not collect metrics")
+    parser.add_argument('--influx-port', default=8086, type=int,
+                        help="Set a custom port for influxDB")
+    parser.add_argument('--metrics-consumers', default=5, type=int,
+                        help="Set custom amount of metrics consumer threads (default 5)")
 
     return parser
