@@ -3,12 +3,20 @@ import queue
 consumerQueue = queue.Queue()
 
 
+def disableMetrics():
+    global consumerQueue
+    consumerQueue = None
+
+
+def checkMetrics():
+    return bool(consumerQueue)
+
+
 def consumeAccessLog():
-    if consumerQueue ==
     return consumerQueue.get()
 
 
-def ipToInt(ip):
+def ipToInt(ip: str):
     num = 0
     for seg in ip.split('.'):
         num = (num << 4) + int(seg)
@@ -38,18 +46,19 @@ class Logger():
     def __init__(self):
         pass
 
-    def __place_log(log):
+    def __place_log__(log):
         if not consumerQueue:
             return
         else:
             consumerQueue.put(log)
 
     def logColdAccess(secondLevelDomainName, timeOfAccess):
-        Logger.__place_log(ColdAccessLog(secondLevelDomainName, timeOfAccess))
+        Logger.__place_log__(ColdAccessLog(
+            secondLevelDomainName, timeOfAccess))
 
     def logHotAccess(secondLevelDomainName, timeOfAccess):
-        Logger.__place_log(HotAccessLog(secondLevelDomainName, timeOfAccess))
+        Logger.__place_log__(HotAccessLog(secondLevelDomainName, timeOfAccess))
 
     def logUniqueAccess(secondLevelDomainName, timeOfAccess, ipOfRequester):
-        Logger.__place_log(UniqueAccessLog(
+        Logger.__place_log__(UniqueAccessLog(
             secondLevelDomainName, timeOfAccess, ipOfRequester))

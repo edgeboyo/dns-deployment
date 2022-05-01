@@ -13,6 +13,8 @@ import traceback
 from api.api import api_startup
 
 from ArgumentParser import prepParser
+from metrics.consumers import startMetricConsumers
+from metrics.loggers import disableMetrics
 from nameserver.dns import createDNSServer
 from nameserver.operators import setResolver
 from objects.domain import setTopLevelDomain
@@ -30,6 +32,7 @@ def startup_checklist():
     args = parser.parse_args()
 
     # Select DNS server type (TCP/UDP)
+
     dns_type = ""
 
     if args.tcp:
@@ -41,6 +44,7 @@ def startup_checklist():
         error_out("Either --tcp or --udp or both are required")
 
     # Select DNS server port and check if valid
+
     dns_port = args.dns_port
 
     if dns_port <= 0:
@@ -69,6 +73,7 @@ def startup_checklist():
     setResolver(args.fallback_dns)
 
     # Select SSGA path, set it and check if valid
+
     try:
         setSSGAPath(args.ssga_path)
     except Exception as e:
@@ -86,6 +91,15 @@ def startup_checklist():
         else:
             print("Error detected on non-NT system")
             raise e
+
+    # Disable metric collection if requested
+
+    if args.no_metrics:
+        disableMetrics()
+
+    # Set up metric consumer threads
+
+    startMetricConsumers(args.metrics_consumers)
 
     # Check if dry run was requested
 
