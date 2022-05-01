@@ -49,7 +49,6 @@ def setResolver(nameServer):
     try:
         resolver.resolve("google.com")
     except:
-        sys.exc_clear()
         raise Exception("Could not fetch Google.com. Fallback DNS invalid")
 
 
@@ -73,8 +72,7 @@ def prep_regex(domainName):
 
 
 def dns_response(data):
-    print(data)
-    from_wire(data)
+    request = from_wire(data)
     request = DNSRecord.parse(data)
 
     print(request)
