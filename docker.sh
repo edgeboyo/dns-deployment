@@ -26,6 +26,7 @@ do
         docker tag dns-deployment registry.digitalocean.com/part3-project/dns-deployment
         docker push registry.digitalocean.com/part3-project/dns-deployment
     elif [[ $var == '-d' ]] || [[ $var == '--deploy' ]]
+    then
         docker pull registry.digitalocean.com/part3-project/dns-deployment
         docker tag registry.digitalocean.com/part3-project/dns-deployment dns-deployment:latest 
     else
