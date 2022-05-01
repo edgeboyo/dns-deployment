@@ -3,6 +3,7 @@ attrs==21.4.0
 autopep8==1.6.0
 certifi==2021.10.8
 charset-normalizer==2.0.12
+ciso8601==2.2.0
 click==8.1.2
 colorama==0.4.4
 dnslib==0.9.19
@@ -10,7 +11,9 @@ dnspython==2.2.1
 Flask==2.1.1
 idna==3.3
 importlib-metadata==4.11.3
+influx-client==1.9.0
 influxdb==5.3.1
+influxdb-client==1.28.0
 iniconfig==1.1.1
 itsdangerous==2.1.2
 Jinja2==3.1.1
@@ -23,8 +26,11 @@ pycodestyle==2.8.0
 pyparsing==3.0.8
 pytest==7.1.2
 python-dateutil==2.8.2
+pytool==3.16.2
 pytz==2022.1
 requests==2.27.1
+Rx==3.2.0
+simplejson==3.17.6
 six==1.16.0
 toml==0.10.2
 tomli==2.0.1

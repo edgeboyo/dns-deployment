@@ -38,9 +38,9 @@ do
       -e DOCKER_INFLUXDB_INIT_USERNAME="superuser" \
       -e DOCKER_INFLUXDB_INIT_PASSWORD="superuser_passwd" \
       -e DOCKER_INFLUXDB_INIT_ORG="part3" \
-      -e DOCKER_INFLUXDB_INIT_BUCKET=my-bucket \
+      -e DOCKER_INFLUXDB_INIT_BUCKET="p3-bucket" \
       -e DOCKER_INFLUXDB_INIT_RETENTION=1w \
-      -e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token \
+      -e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN="secret-auth-token" \
       influxdb:2.0
     else
         echo "Unknown command: $var"
