@@ -13,7 +13,7 @@ import traceback
 from api.api import api_startup
 
 from ArgumentParser import prepParser
-from metrics.consumers import startMetricConsumers
+from metrics.consumers import setUpInfluxDBClient, startMetricConsumers
 from metrics.loggers import disableMetrics
 from nameserver.dns import createDNSServer
 from nameserver.operators import setResolver
@@ -100,6 +100,10 @@ def startup_checklist():
     # Set up metric consumer threads
 
     startMetricConsumers(args.metrics_consumers)
+
+    # Set up InfluxDB client
+
+    setUpInfluxDBClient(args.influx_port)
 
     # Check if dry run was requested
 
