@@ -103,7 +103,8 @@ def startup_checklist():
 
     # Set up InfluxDB client
 
-    setUpInfluxDBClient(args.influx_port)
+    setUpInfluxDBClient(
+        args.influx_port, args.influx_username, args.influx_password)
 
     # Check if dry run was requested
 

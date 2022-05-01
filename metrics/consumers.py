@@ -1,22 +1,44 @@
 
 
 import threading
+import time
 import traceback
 
-from influxdb import InfluxDBClient
+from influxdb_client import InfluxDBClient, Point
+from influxdb_client.client.write_api import SYNCHRONOUS
 
-from metrics.loggers import checkMetrics, consumeAccessLog
+from metrics.loggers import checkMetrics, consumeAccessLog, disableMetrics
 
-influxdb = None
+bucket = "p3-bucket"
+
+client = None
 
 
-def setUpInfluxDBClient(idb_port):
-    global influxdb
+def setUpInfluxDBClient(idb_port, idb_user, idb_passwd):
+    global client
 
     if not checkMetrics():
         return
+    try:
+        print(f"Logging in: P:{idb_port}, U:{idb_user}, P:{idb_passwd}")
 
-    influxdb = InfluxDBClient(port=idb_port)
+        client = InfluxDBClient(url="localhost",
+                                port=idb_port, username=idb_user, password=idb_passwd, org="p3", token='secret-auth-token', bucket=bucket)
+
+        write_api = client.write_api(write_options=SYNCHRONOUS)
+        query_api = client.query_api()
+
+        client = (write_api, query_api, client)
+    except:
+        print("Error connecting to Influx DB")
+        traceback.print_exc()
+        print("\nAwaiting user termination...")
+        print("Progressing without metrics will commence in 5 seconds")
+        time.sleep(5)
+        client = None
+        disableMetrics()
+        print("Processing...")
+        return
 
     return
 

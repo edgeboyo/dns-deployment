@@ -26,6 +26,10 @@ def prepParser():
                         help="Allow for the deployment to not collect metrics")
     parser.add_argument('--influx-port', default=8086, type=int,
                         help="Set a custom port for influxDB")
+    parser.add_argument('--influx-username', default="superuser", type=str,
+                        help="Set a custom username for influxDB (default \"superuser\"")
+    parser.add_argument('--influx-password', default="superuser_passwd", type=str,
+                        help="Set a custom username for influxDB (default \"superuser_passwd\"")
     parser.add_argument('--metrics-consumers', default=5, type=int,
                         help="Set custom amount of metrics consumer threads (default 5)")
 
