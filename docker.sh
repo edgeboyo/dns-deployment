@@ -29,18 +29,10 @@ do
     then
         docker pull registry.digitalocean.com/part3-project/dns-deployment
         docker tag registry.digitalocean.com/part3-project/dns-deployment dns-deployment:latest
-    elif [[ $var == '-i']] || [[ $var == '--influx-db' ]]
+    elif [[ $var == '-i' ]] || [[ $var == '--influx-db' ]]
     then
-        docker run -p 8086:8086 \
-      -v influxdb:/var/lib/influxdb \
-      -v influxdb2:/var/lib/influxdb2 \
-      -v influxdb2-config:/etc/influxdb2 \
-      -v $PWD/influxdb.conf:/etc/influxdb/influxdb.conf \
-      -e DOCKER_INFLUXDB_INIT_MODE=upgrade \
-      -e DOCKER_INFLUXDB_INIT_USERNAME=my-user \
-      -e DOCKER_INFLUXDB_INIT_PASSWORD=my-password \
-      -e DOCKER_INFLUXDB_INIT_ORG=my-org \
-      -e DOCKER_INFLUXDB_INIT_BUCKET=my-bucket \
+        docker run -d -p 8086:8086 \
+      -v $PWD/dns-metrics:/var/lib/influxdb2 \
       influxdb:2.0
     else
         echo "Unknown command: $var"
