@@ -127,8 +127,11 @@ def dns_response(data):
 
     # Add to cache after all data passed the translation
     # Sets the highest TTL value within records request as TTL
-    print(cacheTTL)
-    cache.place(qn, records, cacheTTL)
+    # We are ignoring put misses as the cache has limited size
+    try:
+        cache.place(qn, records, cacheTTL)
+    except:
+        pass
 
     print("---- Reply:\n", reply)
 
