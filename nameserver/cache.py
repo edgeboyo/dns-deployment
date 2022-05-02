@@ -91,7 +91,7 @@ class Entry():
     def __lt__(self, entry):
         return self.timeOfDeath < entry.timeOfDeath
 
-    def refreshTTL(self, ttl=None, newObject=None):
+    def refreshTTL(self, newObject=None, ttl=None):
         if ttl == None:
             ttl = self.ttl
 
