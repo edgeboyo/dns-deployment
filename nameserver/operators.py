@@ -1,10 +1,10 @@
 from itertools import cycle
+from metrics.loggers import Logger
 import re
 from dnslib import *
 import dns.resolver
-from dns.message import from_wire
 from nameserver.cache import TTLCache
-from objects.domain import checkTLD, requestRecords
+from objects.domain import checkTLD, getNthLevelDomain, getLocalTLD, requestRecords
 
 # All of this needs to go and has to fetch data from flat files in the data files
 
@@ -72,7 +72,7 @@ def prep_regex(domainName):
 cache = TTLCache(cycleTime=60, maxFaults=50)
 
 
-def dns_response(data):
+def dns_response(data, requesterIP):
     # request = from_wire(data)
     request = DNSRecord.parse(data)
 
@@ -102,6 +102,16 @@ def dns_response(data):
         for a in answer:
             # print(type(a))
             records[name].append((A(str(a)), None, answer.rrset.ttl))
+
+    tld = getNthLevelDomain(qn, 1)
+    sld = getNthLevelDomain(qn, 2)
+
+    if tld == getLocalTLD():
+        Logger.logUniqueAccess(sld, time.time(), requesterIP)
+        if isCached:
+            Logger.logHotAccess(sld, time.time())
+        else:
+            Logger.logColdAccess(sld, time.time())
 
     cacheTTL = 0
     # All of this stuff might get thrown out

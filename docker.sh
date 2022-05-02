@@ -20,7 +20,7 @@ do
         docker build --tag dns-deployment .
     elif [[ $var == '-c' ]] || [[ $var == '--create' ]] 
     then
-        docker run -p 80:80 -p 53:53/tcp -p 53:53/udp -d dns-deployment
+        docker run --add-host host.docker.internal:host-gateway -p 53:53/tcp -p 53:53/udp -p 80:80  -d dns-deployment
     elif [[ $var == '-p' ]] || [[ $var == '--publish' ]]
     then
         docker tag dns-deployment registry.digitalocean.com/part3-project/dns-deployment
@@ -28,7 +28,20 @@ do
     elif [[ $var == '-d' ]] || [[ $var == '--download' ]]
     then
         docker pull registry.digitalocean.com/part3-project/dns-deployment
-        docker tag registry.digitalocean.com/part3-project/dns-deployment dns-deployment:latest 
+        docker tag registry.digitalocean.com/part3-project/dns-deployment dns-deployment:latest
+    elif [[ $var == '-i' ]] || [[ $var == '--influx-db' ]]
+    then
+        docker run -d -p 8086:8086 \
+      -v "$PWD/data":/var/lib/influxdb2 \
+      -v "$PWD/config":/etc/influxdb2 \
+      -e DOCKER_INFLUXDB_INIT_MODE=setup \
+      -e DOCKER_INFLUXDB_INIT_USERNAME="superuser" \
+      -e DOCKER_INFLUXDB_INIT_PASSWORD="superuser_passwd" \
+      -e DOCKER_INFLUXDB_INIT_ORG="part3" \
+      -e DOCKER_INFLUXDB_INIT_BUCKET="p3-bucket" \
+      -e DOCKER_INFLUXDB_INIT_RETENTION=1w \
+      -e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN="secret-auth-token" \
+      influxdb:2.0
     else
         echo "Unknown command: $var"
         echo "Check usage..."
