@@ -4,6 +4,8 @@ import argparse
 def prepParser():
     parser = argparse.ArgumentParser(
         description='Start a DNS implemented in Python. Usually DNSs use UDP on port 53.')
+    parser.add_argument('-d', dest='docker', action="store_true",
+                        help="Set this flag to use internal docker addresses (for docker deployment)")
     parser.add_argument('--dns-port', default=53, type=int,
                         help='The port to listen on for the DNS server.')
     parser.add_argument('--http-port', default=80, type=int,

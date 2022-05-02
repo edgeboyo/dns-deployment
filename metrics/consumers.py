@@ -14,13 +14,13 @@ bucket = "p3-bucket"
 client: InfluxDBClient = None
 
 
-def setUpInfluxDBClient(idb_port, idb_user, idb_passwd):
+def setUpInfluxDBClient(idb_url, idb_port, idb_user, idb_passwd):
     global client
 
     if not checkMetrics():
         return
     try:
-        client = InfluxDBClient(url=f"http://localhost:{idb_port}",
+        client = InfluxDBClient(url=f"http://{idb_url}:{idb_port}",
                                 org="part3", token='secret-auth-token', bucket=bucket)
 
         query_api = client.query_api()
