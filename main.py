@@ -101,18 +101,18 @@ def startup_checklist():
 
     startMetricConsumers(args.metrics_consumers)
 
-    # Set up InfluxDB client
-
-    influx_url = '127.0.0.1' if not args.docker else 'host.docker.internal'
-
-    setUpInfluxDBClient(influx_url,
-                        args.influx_port, args.influx_org, args.influx_token)
-
     # Check if dry run was requested
 
     if args.dry_run:
         print("This configuration appears valid. Ending program due to dry run argument")
         exit()
+
+    # Set up InfluxDB client (after dry run for CI safety)
+
+    influx_url = '127.0.0.1' if not args.docker else 'host.docker.internal'
+
+    setUpInfluxDBClient(influx_url,
+                        args.influx_port, args.influx_org, args.influx_token)
 
     return (dns_type, dns_port, http_port)
 
