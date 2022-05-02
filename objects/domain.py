@@ -5,7 +5,7 @@ from objects.io import fetchDomainFile, listDomainNames, runSSGA
 from objects.records import interpretRecord, validateRecord, supportedRecords
 from objects.utils import stampToISO
 
-tld = None  # if this provided None if imported use, getTLD
+tld = None
 
 
 def setTopLevelDomain(topLevelDomain):
@@ -18,7 +18,8 @@ def setTopLevelDomain(topLevelDomain):
     tld = topLevelDomain
 
 
-def getTLD():
+# get TLD of the system
+def getLocalTLD():
     return tld
 
 
@@ -76,31 +77,40 @@ def overrideRecords(domainName, recordType, records):
 
 
 def checkTLD(domainName: str):
-    return domainName.endswith("." + getTLD()) or domainName.endswith("." + tld + ".")
+    return domainName.endswith("." + tld) or domainName.endswith("." + tld + ".")
+
+# Get second level domain of local deployment
+
+
+def getNthLevelDomain(domainName, level):
+    encounteredTLD = False
+    secondLevel = None
+
+    segments = list(reversed(domainName.split('.')))
+
+    if len(segments[0]) == 0:
+        del segments[0]
+
+    for i, segment in enumerate(segments):
+        if len(segments) == 0:
+            raise Exception(
+                f"Misshapen domain lookup. Encountered empty domain level {i + 1} in {domainName}")
+        elif i + 1 == level:
+            return segment
+
+    raise Exception(
+        f"Domain name {domainName} does not have a {level} level domain")
 
 
 def requestRecords(domainName: str):
-    segments = domainName.split(".")
-
-    encounteredTLD = False
-    secondLevel = None
-    for segment in reversed(segments):
-        if len(segment) == 0:
-            continue
-
-        if not encounteredTLD and segment == tld:
-            encounteredTLD = True
-            continue
-
-        secondLevel = segment
-        break
-
+    secondLevel = getNthLevelDomain(domainName, 2)
     if secondLevel == None:
         return {}
 
-    print(secondLevel)
-
-    domain = fetchDomain(secondLevel)
+    try:
+        domain = fetchDomain(secondLevel)
+    except:
+        return {}
 
     records = interpretRecord(domain['records'], secondLevel, tld)
 

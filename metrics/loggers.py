@@ -1,5 +1,7 @@
 import queue
 
+from objects.utils import stampToISO
+
 consumerQueue = queue.Queue()
 
 
@@ -19,8 +21,23 @@ def consumeAccessLog():
 def ipToInt(ip: str):
     num = 0
     for seg in ip.split('.'):
-        num = (num << 4) + int(seg)
+        num = (num << 8) + int(seg)
     return num
+
+
+def intToIP(num: int):
+    segments = []
+    for _ in range(4):
+        seg = str(num % 256)
+        num >>= 8
+        segments.append(seg)
+
+    if num != 0:
+        print(segments)
+        print(num)
+        raise Exception("IP couldn't be converted back to string")
+
+    return ".".join(reversed(segments))
 
 
 class ColdAccessLog():
@@ -28,11 +45,18 @@ class ColdAccessLog():
         self.domain = secondLevelDomainName
         self.timeOfAccess = timeOfAccess
 
+    def __str__(self):
+        print(
+            f"Logged COLD access on {stampToISO(self.timeOfAccess)} to {self.domain}")
+
 
 class HotAccessLog():
     def __init__(self, secondLevelDomainName, timeOfAccess):
         self.domain = secondLevelDomainName
         self.timeOfAccess = timeOfAccess
+
+    def __str__(self):
+        return f"Logged HOT access on {stampToISO(self.timeOfAccess)} to {self.domain}"
 
 
 class UniqueAccessLog():
@@ -40,6 +64,9 @@ class UniqueAccessLog():
         self.domain = secondLevelDomainName
         self.timeOfAccess = timeOfAccess
         self.ip = ipToInt(ip)
+
+    def __str__(self):
+        return f"Logged UNIQUE access from {intToIP(self.ip)} on {stampToISO(self.timeOfAccess)} to {self.domain}"
 
 
 class Logger():

@@ -47,7 +47,6 @@ def startMetricConsumers(amount):
 
     if not checkMetrics():
         print("Metric collection disabled. No threads started")
-        return
 
     for i in range(amount):
         thread = threading.Thread(target=consume, args=(i+1,))
@@ -62,7 +61,8 @@ def consume(threadId):
     while True:
         try:
             log = consumeAccessLog()
-            # Do more stuff
+            print(f"[MetricConsumer #{threadId}] {log}")
+            (write_api, *_) = client
         except:
             print("Metric collector error: ")
             traceback.print_exc()
