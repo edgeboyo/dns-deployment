@@ -21,9 +21,12 @@ def setUpInfluxDBClient(idb_port, idb_user, idb_passwd):
         return
     try:
         client = InfluxDBClient(url="localhost",
-                                port=idb_port + 1, org="part3", token='secret-auth-token', bucket=bucket)
+                                port=idb_port, org="part3", token='secret-auth-token', bucket=bucket)
 
-        # client
+        query_api = client.query_api()
+        tables = query_api.query(
+            f'from(bucket:"{bucket}") |> range(start: -10m)')
+        print(tables)
     except:
         print("Error connecting to Influx DB")
         traceback.print_exc()
@@ -51,17 +54,12 @@ def startMetricConsumers(amount):
 
 def consume(threadId):
 
-    print(f"Metric thread #{threadId} starting...")
+    print(f"[MetricConsumer #{threadId}] starting...")
 
     while True:
         try:
             log = consumeAccessLog()
             print(f"[MetricConsumer #{threadId}] {log}")
-
-            query_api = client.query_api()
-            tables = query_api.query(
-                f'from(bucket:"{bucket}") |> range(start: -10m)')
-            print(tables)
 
             write_api = client.write_api(write_options=SYNCHRONOUS)
             write_api.write(bucket=bucket, record=log.toPoint())
