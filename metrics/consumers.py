@@ -20,6 +20,7 @@ def setUpInfluxDBClient(idb_url, idb_port, idb_org, idb_token):
     if not checkMetrics():
         return
     try:
+        print(f"Connecting to {idb_url} on port {idb_port}")
         client = InfluxDBClient(url=f"http://{idb_url}:{idb_port}",
                                 org=idb_org, token=idb_token, bucket=bucket)
 

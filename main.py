@@ -109,7 +109,7 @@ def startup_checklist():
 
     # Set up InfluxDB client (after dry run for CI safety)
 
-    influx_url = '127.0.0.1' if not args.docker else 'host.docker.internal'
+    influx_url = '127.0.0.1' if not args.docker else 'influx-db'
 
     setUpInfluxDBClient(influx_url,
                         args.influx_port, args.influx_org, args.influx_token)
@@ -138,7 +138,7 @@ def server_startup(dns_type, dns_port, http_port):
             sys.stdout.flush()
 
     except KeyboardInterrupt:
-        pass
+        exit()
     finally:
         dnsServer.shutdown()
 

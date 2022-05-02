@@ -8,9 +8,11 @@ then
     echo "-c/--create - Create new docker container"
     echo "-p/--publish - Publish this image to a docker repository (required login to repo)"
     echo "-d/--download - Download the image from the docker repository (required login to repo)"
+    echo "-n/--network - Set up internal network for the containers"
+    echo "-u/--up - Set up both required containers and remove previous versions"
     echo "-h/--help - Show this message"
     echo "---------------------------------------------------------------"
-    return 1
+    exit 1
 fi
 
 for var in "$@"
@@ -20,7 +22,7 @@ do
         docker build --tag dns-deployment .
     elif [[ $var == '-c' ]] || [[ $var == '--create' ]] 
     then
-        docker run --add-host host.docker.internal:host-gateway -p 53:53/tcp -p 53:53/udp -p 80:80  -d dns-deployment
+        docker run -d --network deployment-network --name=dns-deployment -p 53:53/tcp -p 53:53/udp -p 80:80 dns-deployment
     elif [[ $var == '-p' ]] || [[ $var == '--publish' ]]
     then
         docker tag dns-deployment registry.digitalocean.com/part3-project/dns-deployment
@@ -31,7 +33,7 @@ do
         docker tag registry.digitalocean.com/part3-project/dns-deployment dns-deployment:latest
     elif [[ $var == '-i' ]] || [[ $var == '--influx-db' ]]
     then
-        docker run -d -p 8086:8086 \
+        docker run -d --network deployment-network --name=influx-db -p 8086:8086 \
       -v "$PWD/data":/var/lib/influxdb2 \
       -v "$PWD/config":/etc/influxdb2 \
       -e DOCKER_INFLUXDB_INIT_MODE=setup \
@@ -42,9 +44,20 @@ do
       -e DOCKER_INFLUXDB_INIT_RETENTION=1w \
       -e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN="secret-auth-token" \
       influxdb:2.0
+    elif [[ $var == '-n' ]] || [[ $var == '--network' ]]
+    then
+        docker network create deployment-network
+    elif [[ $var == '-u' ]] || [[ $var == '--up' ]]
+    then
+        docker container stop dns-deployment influx-db
+        docker container rm dns-deployment influx-db
+        $0 -i
+        echo "Waiting 30 seconds for db startup..."
+        sleep 30
+        $0 -c
     else
         echo "Unknown command: $var"
         echo "Check usage..."
-        return 2
+        exit 2
     fi
 done
