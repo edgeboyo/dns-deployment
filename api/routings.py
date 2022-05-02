@@ -1,7 +1,7 @@
 import traceback
 from flask import Flask, request
 
-from objects.domain import createNewDomain, fetchAllDomainNames, fetchDomain, overrideRecords
+from objects.domain import createNewDomain, deleteDomain, fetchAllDomainNames, fetchDomain, overrideRecords
 
 from api.returns import return_json, return_error
 
@@ -68,6 +68,16 @@ def api_domain_details(domainName):
     domain['records'] = f'/api/domains/{domainName}/records'
 
     return return_json(domain)
+
+
+@app.route("/api/domains/<domainName>", methods=["DELETE"])
+def api_delete_domain(domainName):
+    try:
+        deleteDomain(domainName)
+    except Exception as e:
+        return return_error(str(e), 404)
+
+    return return_json({"message": "Domain removed"})
 
 
 @app.route("/api/domains/<domainName>/records", methods=["GET"])

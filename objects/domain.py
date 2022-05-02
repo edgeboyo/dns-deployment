@@ -1,4 +1,5 @@
 import json
+import os
 import time
 
 from objects.io import fetchDomainFile, listDomainNames, runSSGA
@@ -49,6 +50,12 @@ def createNewDomain(domainName):
 def fetchDomain(domainName):
     with open(fetchDomainFile(domainName)) as f:
         return json.load(f)
+
+
+def deleteDomain(domainName):
+    domainFile = fetchDomainFile(domainName)
+
+    os.remove(domainFile)
 
 
 def fetchAllDomainNames():
