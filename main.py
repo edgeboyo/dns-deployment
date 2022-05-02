@@ -13,6 +13,8 @@ import traceback
 from api.api import api_startup
 
 from ArgumentParser import prepParser
+from metrics.consumers import setUpInfluxDBClient, startMetricConsumers
+from metrics.loggers import disableMetrics
 from nameserver.dns import createDNSServer
 from nameserver.operators import setResolver
 from objects.domain import setTopLevelDomain
@@ -30,6 +32,7 @@ def startup_checklist():
     args = parser.parse_args()
 
     # Select DNS server type (TCP/UDP)
+
     dns_type = ""
 
     if args.tcp:
@@ -41,6 +44,7 @@ def startup_checklist():
         error_out("Either --tcp or --udp or both are required")
 
     # Select DNS server port and check if valid
+
     dns_port = args.dns_port
 
     if dns_port <= 0:
@@ -69,6 +73,7 @@ def startup_checklist():
     setResolver(args.fallback_dns)
 
     # Select SSGA path, set it and check if valid
+
     try:
         setSSGAPath(args.ssga_path)
     except Exception as e:
@@ -87,11 +92,27 @@ def startup_checklist():
             print("Error detected on non-NT system")
             raise e
 
+    # Disable metric collection if requested
+
+    if args.no_metrics:
+        disableMetrics()
+
+    # Set up metric consumer threads
+
+    startMetricConsumers(args.metrics_consumers)
+
     # Check if dry run was requested
 
     if args.dry_run:
         print("This configuration appears valid. Ending program due to dry run argument")
         exit()
+
+    # Set up InfluxDB client (after dry run for CI safety)
+
+    influx_url = '127.0.0.1' if not args.docker else 'host.docker.internal'
+
+    setUpInfluxDBClient(influx_url,
+                        args.influx_port, args.influx_org, args.influx_token)
 
     return (dns_type, dns_port, http_port)
 

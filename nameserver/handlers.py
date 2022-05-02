@@ -24,7 +24,7 @@ class BaseRequestHandler(socketserver.BaseRequestHandler):
         try:
             data = self.get_data()
             print(len(data), data)  # repr(data).replace('\\x', '')[1:-1]
-            self.send_data(dns_response(data))
+            self.send_data(dns_response(data, self.client_address[0]))
         except Exception:
             traceback.print_exc(file=sys.stderr)
 
