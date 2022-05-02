@@ -20,8 +20,8 @@ def setUpInfluxDBClient(idb_port, idb_user, idb_passwd):
     if not checkMetrics():
         return
     try:
-        client = InfluxDBClient(url="localhost",
-                                port=idb_port, org="part3", token='secret-auth-token', bucket=bucket)
+        client = InfluxDBClient(url=f"http://localhost:{idb_port}",
+                                org="part3", token='secret-auth-token', bucket=bucket)
 
         query_api = client.query_api()
         tables = query_api.query(
@@ -37,6 +37,8 @@ def setUpInfluxDBClient(idb_port, idb_user, idb_passwd):
         disableMetrics()
         print("Processing...")
         return
+
+    print("Starting InfluxDB connection...")
 
     return
 

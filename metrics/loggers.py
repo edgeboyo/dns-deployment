@@ -46,7 +46,7 @@ class ColdAccessLog():
     def __init__(self, secondLevelDomainName, timeOfAccess):
         self.domain = secondLevelDomainName
         self.timeOfAccess = timeOfAccess
-        self.stamp = int(timeOfAccess * 10 ** 6)
+        self.stamp = int(timeOfAccess * 10 ** 9)
 
     def __str__(self):
         return f"Logged COLD access on {stampToISO(self.timeOfAccess)} to {self.domain}"
@@ -59,27 +59,27 @@ class HotAccessLog():
     def __init__(self, secondLevelDomainName, timeOfAccess):
         self.domain = secondLevelDomainName
         self.timeOfAccess = timeOfAccess
-        self.stamp = int(timeOfAccess * 10 ** 6)
+        self.stamp = int(timeOfAccess * 10 ** 9)
 
     def __str__(self):
         return f"Logged HOT access on {stampToISO(self.timeOfAccess)} to {self.domain}"
 
     def toPoint(self):
-        return Point('hot_access').tag('secondLevelDomain', self.domain).field('access', 1).time(self.stamp)
+        return Point('hot_access').tag('secondLevelDomain', self.domain).field('access', 1)
 
 
 class UniqueAccessLog():
     def __init__(self, secondLevelDomainName, timeOfAccess, ip):
         self.domain = secondLevelDomainName
         self.timeOfAccess = timeOfAccess
-        self.stamp = int(timeOfAccess * 10 ** 6)
+        self.stamp = int(timeOfAccess * 10 ** 9)
         self.ip = ipToInt(ip)
 
     def __str__(self):
         return f"Logged UNIQUE access from {intToIP(self.ip)} on {stampToISO(self.timeOfAccess)} to {self.domain}"
 
     def toPoint(self):
-        return Point('unique_access').tag('secondLevelDomain', self.domain).field('ipValue', self.ip).time(self.stamp)
+        return Point('unique_access').tag('secondLevelDomain', self.domain).field('ipValue', self.ip)
 
 
 class Logger():
