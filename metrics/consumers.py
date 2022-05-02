@@ -11,7 +11,7 @@ from metrics.loggers import checkMetrics, consumeAccessLog, disableMetrics
 
 bucket = "p3-bucket"
 
-client = None
+client: InfluxDBClient = None
 
 
 def setUpInfluxDBClient(idb_port, idb_user, idb_passwd):
@@ -20,15 +20,10 @@ def setUpInfluxDBClient(idb_port, idb_user, idb_passwd):
     if not checkMetrics():
         return
     try:
-        print(f"Logging in: P:{idb_port}, U:{idb_user}, P:{idb_passwd}")
-
         client = InfluxDBClient(url="localhost",
-                                port=idb_port, username=idb_user, password=idb_passwd, org="p3", token='secret-auth-token', bucket=bucket)
+                                port=idb_port + 1, org="part3", token='secret-auth-token', bucket=bucket)
 
-        write_api = client.write_api(write_options=SYNCHRONOUS)
-        query_api = client.query_api()
-
-        client = (write_api, query_api, client)
+        # client
     except:
         print("Error connecting to Influx DB")
         traceback.print_exc()
@@ -62,7 +57,14 @@ def consume(threadId):
         try:
             log = consumeAccessLog()
             print(f"[MetricConsumer #{threadId}] {log}")
-            (write_api, *_) = client
+
+            query_api = client.query_api()
+            tables = query_api.query(
+                f'from(bucket:"{bucket}") |> range(start: -10m)')
+            print(tables)
+
+            write_api = client.write_api(write_options=SYNCHRONOUS)
+            write_api.write(bucket=bucket, record=log.toPoint())
         except:
             print("Metric collector error: ")
             traceback.print_exc()

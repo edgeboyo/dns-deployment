@@ -2,6 +2,8 @@ import queue
 
 from objects.utils import stampToISO
 
+from influxdb_client import Point
+
 consumerQueue = queue.Queue()
 
 
@@ -44,29 +46,40 @@ class ColdAccessLog():
     def __init__(self, secondLevelDomainName, timeOfAccess):
         self.domain = secondLevelDomainName
         self.timeOfAccess = timeOfAccess
+        self.stamp = int(timeOfAccess * 10 ** 6)
 
     def __str__(self):
-        print(
-            f"Logged COLD access on {stampToISO(self.timeOfAccess)} to {self.domain}")
+        return f"Logged COLD access on {stampToISO(self.timeOfAccess)} to {self.domain}"
+
+    def toPoint(self):
+        return Point('cold_access').tag('secondLevelDomain', self.domain).field('access', 1).time(self.stamp)
 
 
 class HotAccessLog():
     def __init__(self, secondLevelDomainName, timeOfAccess):
         self.domain = secondLevelDomainName
         self.timeOfAccess = timeOfAccess
+        self.stamp = int(timeOfAccess * 10 ** 6)
 
     def __str__(self):
         return f"Logged HOT access on {stampToISO(self.timeOfAccess)} to {self.domain}"
+
+    def toPoint(self):
+        return Point('hot_access').tag('secondLevelDomain', self.domain).field('access', 1).time(self.stamp)
 
 
 class UniqueAccessLog():
     def __init__(self, secondLevelDomainName, timeOfAccess, ip):
         self.domain = secondLevelDomainName
         self.timeOfAccess = timeOfAccess
+        self.stamp = int(timeOfAccess * 10 ** 6)
         self.ip = ipToInt(ip)
 
     def __str__(self):
         return f"Logged UNIQUE access from {intToIP(self.ip)} on {stampToISO(self.timeOfAccess)} to {self.domain}"
+
+    def toPoint(self):
+        return Point('unique_access').tag('secondLevelDomain', self.domain).field('ipValue', self.ip).time(self.stamp)
 
 
 class Logger():
