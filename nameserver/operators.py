@@ -1,7 +1,9 @@
+from itertools import cycle
 import re
 from dnslib import *
 import dns.resolver
 from dns.message import from_wire
+from nameserver.cache import TTLCache
 from objects.domain import checkTLD, requestRecords
 
 # All of this needs to go and has to fetch data from flat files in the data files
@@ -52,10 +54,6 @@ def setResolver(nameServer):
         raise Exception("Could not fetch Google.com. Fallback DNS invalid")
 
 
-def interpret_local_records(records):
-    pass
-
-
 def prep_regex(domainName):
     regex = ""
 
@@ -71,8 +69,11 @@ def prep_regex(domainName):
     return regex
 
 
+cache = TTLCache(cycleTime=60, maxFaults=50)
+
+
 def dns_response(data):
-    request = from_wire(data)
+    # request = from_wire(data)
     request = DNSRecord.parse(data)
 
     print(request)
@@ -85,7 +86,11 @@ def dns_response(data):
     qtype = request.q.qtype
     qt = QTYPE[qtype]
 
-    if checkTLD(qn):
+    (cachedValue, isCached) = cache.request(qn)
+
+    if isCached:
+        records = cachedValue.value
+    elif checkTLD(qn):
         records = requestRecords(qn)
         # records = interpretRecord(records)
         print(records)
@@ -98,6 +103,7 @@ def dns_response(data):
             # print(type(a))
             records[name].append((A(str(a)), None, answer.rrset.ttl))
 
+    cacheTTL = 0
     # All of this stuff might get thrown out
     for name, rss in records.items():
         regex = prep_regex(name)
@@ -108,6 +114,7 @@ def dns_response(data):
                 if qt in ['*', rqt]:
                     reply.add_answer(RR(rname=qname, rtype=getattr(
                         QTYPE, rqt), rclass=1, ttl=TTL, rdata=rdata))
+                    cacheTTL = max(cacheTTL, TTL)
 
     # This code here is for NS and auth records. Since we don't use it now it should be omitted
     # Will be addressed later
@@ -117,6 +124,11 @@ def dns_response(data):
 
     reply.add_auth(RR(rname=D, rtype=QTYPE.SOA,
                       rclass=1, ttl=TTL, rdata=soa_record))
+
+    # Add to cache after all data passed the translation
+    # Sets the highest TTL value within records request as TTL
+    print(cacheTTL)
+    cache.place(qn, records, cacheTTL)
 
     print("---- Reply:\n", reply)
 
