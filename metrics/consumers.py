@@ -25,7 +25,7 @@ def setUpInfluxDBClient(idb_url, idb_port, idb_org, idb_token):
                                 org=idb_org, token=idb_token, bucket=bucket)
 
         query_api = client.query_api()
-        tables = query_api.query(
+        query_api.query(
             f'from(bucket:"{bucket}") |> range(start: -10m)')
     except:
         print("Error connecting to Influx DB")

@@ -1,4 +1,3 @@
-from inspect import trace
 import time
 import traceback
 from dnslib import *

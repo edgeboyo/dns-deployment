@@ -1,7 +1,7 @@
-import traceback
 from flask import Flask, request
+from metrics.analysis import analyzeDomains
 
-from objects.domain import createNewDomain, deleteDomain, fetchAllDomainNames, fetchDomain, overrideRecords
+from objects.domain import createNewDomain, deleteDomain, fetchAllDomainNames, fetchDomain, findSimilarDomains, overrideRecords
 
 from api.returns import return_json, return_error
 
@@ -17,7 +17,9 @@ def gui_root():
 def api_root():
     from objects.domain import tld
     data = {"documentation": "/api/docs",
-            "topLevelDomain": f".{tld}", "domains": "/api/domains"}
+            "topLevelDomain": f".{tld}",
+            "domains": "/api/domains",
+            "analyzer": "/api/analyze"}
     return return_json(data)
 
 
@@ -133,3 +135,24 @@ def api_domain_records_change(domainName, recordType):
         return return_error(str(e))
 
     return return_json(records)
+
+
+@app.route("/api/analyze", methods=["GET"])
+def api_analyze():
+    arguments = request.args.to_dict()
+
+    required = {'domain': "Input domain you want to analyze",
+                'similarity': "Input the threshold of similarity (per 5 characters rounded up)"}
+
+    for field, desc in required.items():
+        if field not in arguments:
+            return return_error(f"{desc} as `{field}` field in your query parameters")
+
+    try:
+        analysisResults = findSimilarDomains(**arguments)
+        analysisResults['domain'] = 0
+        metricsResults = analyzeDomains(list(analysisResults.keys()))
+    except Exception as e:
+        return return_error(str(e), 404)
+
+    return return_json(metricsResults)

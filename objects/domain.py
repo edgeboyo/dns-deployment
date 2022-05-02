@@ -122,3 +122,30 @@ def requestRecords(domainName: str):
     records = interpretRecord(domain['records'], secondLevel, tld)
 
     return records
+
+
+def findSimilarDomains(domain: str, similarity: int, **kargs):
+    baseSSGA = fetchDomain(domain)['ssgaResult']
+    setBaseSSGA = set(baseSSGA)
+
+    if baseSSGA == None:
+        raise Exception("Cannot analyze domain with no Semantic String")
+
+    similarity = int(similarity)
+    analyzedDomain = domain
+    results = {}
+    for domain in listDomainNames():
+        if domain == analyzedDomain:
+            continue
+
+        domain = fetchDomain(domain)
+        ssga = domain['ssgaResult']
+        setSSGA = set(ssga)
+
+        difference = len((setBaseSSGA | setSSGA) -
+                         setBaseSSGA.intersection(setSSGA))
+
+        if difference >= similarity:
+            results[domain] = difference
+
+    return results
