@@ -106,7 +106,7 @@ def startup_checklist():
     influx_url = '127.0.0.1' if not args.docker else 'host.docker.internal'
 
     setUpInfluxDBClient(influx_url,
-                        args.influx_port, args.influx_username, args.influx_password)
+                        args.influx_port, args.influx_org, args.influx_token)
 
     # Check if dry run was requested
 

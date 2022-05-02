@@ -27,11 +27,11 @@ def prepParser():
     parser.add_argument('--no-metrics', action='store_true',
                         help="Allow for the deployment to not collect metrics")
     parser.add_argument('--influx-port', default=8086, type=int,
-                        help="Set a custom port for influxDB")
-    parser.add_argument('--influx-username', default="superuser", type=str,
-                        help="Set a custom username for influxDB (default \"superuser\"")
-    parser.add_argument('--influx-password', default="superuser_passwd", type=str,
-                        help="Set a custom username for influxDB (default \"superuser_passwd\"")
+                        help="Set a custom port for InfluxDB")
+    parser.add_argument('--influx-token', default="secret-auth-token", type=str,
+                        help="Set a custom auth token for InfluxDB (default \"secret-auth-token\")")
+    parser.add_argument('--influx-org', default="part3", type=str,
+                        help="Set a custom org for InfluxDB (default \"part3\")")
     parser.add_argument('--metrics-consumers', default=5, type=int,
                         help="Set custom amount of metrics consumer threads (default 5)")
 
