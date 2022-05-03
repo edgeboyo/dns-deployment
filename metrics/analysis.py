@@ -90,7 +90,7 @@ def processMetrics(metrics):
         hotRank.append((hot, domain))
         coldRank.append((cold, domain))
         uniqueRank.append((unique, domain))
-        propRank.append((hot / cold, domain))
+        propRank.append((hot / cold if cold != 0 else 0, domain))
 
     # Sort values from
     hotRank.sort()
