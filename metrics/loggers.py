@@ -52,7 +52,7 @@ class ColdAccessLog():
         return f"Logged COLD access on {stampToISO(self.timeOfAccess)} to {self.domain}"
 
     def toPoint(self):
-        return Point('cold_access').tag('secondLevelDomain', self.domain).field('access', 1).time(self.stamp)
+        return Point('cold_access').tag('secondLevelDomain', self.domain).field('coldAccess', 1).time(self.stamp)
 
 
 class HotAccessLog():
@@ -65,7 +65,7 @@ class HotAccessLog():
         return f"Logged HOT access on {stampToISO(self.timeOfAccess)} to {self.domain}"
 
     def toPoint(self):
-        return Point('hot_access').tag('secondLevelDomain', self.domain).field('access', 1)
+        return Point('hot_access').tag('secondLevelDomain', self.domain).field('hotAccess', 1).time(self.stamp)
 
 
 class UniqueAccessLog():
@@ -79,7 +79,7 @@ class UniqueAccessLog():
         return f"Logged UNIQUE access from {intToIP(self.ip)} on {stampToISO(self.timeOfAccess)} to {self.domain}"
 
     def toPoint(self):
-        return Point('unique_access').tag('secondLevelDomain', self.domain).field('ipValue', self.ip)
+        return Point('unique_access').tag('secondLevelDomain', self.domain).field('uniqueAccess', self.ip).time(self.stamp)
 
 
 class Logger():

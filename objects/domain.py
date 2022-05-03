@@ -134,18 +134,18 @@ def findSimilarDomains(domain: str, similarity: int, **kargs):
     similarity = int(similarity)
     analyzedDomain = domain
     results = {}
-    for domain in listDomainNames():
-        if domain == analyzedDomain:
+    for domainName in listDomainNames():
+        if domainName == analyzedDomain:
             continue
 
-        domain = fetchDomain(domain)
+        domain = fetchDomain(domainName)
         ssga = domain['ssgaResult']
         setSSGA = set(ssga)
 
         difference = len((setBaseSSGA | setSSGA) -
                          setBaseSSGA.intersection(setSSGA))
 
-        if difference >= similarity:
-            results[domain] = difference
+        if difference <= similarity:
+            results[domainName] = difference
 
     return results

@@ -1,3 +1,4 @@
+import traceback
 from flask import Flask, request
 from metrics.analysis import analyzeDomains
 
@@ -150,9 +151,22 @@ def api_analyze():
 
     try:
         analysisResults = findSimilarDomains(**arguments)
-        analysisResults['domain'] = 0
-        metricsResults = analyzeDomains(list(analysisResults.keys()))
+        analysisResults[arguments['domain']] = 0
+        print(analysisResults)
+        (metricsResults, raw) = analyzeDomains(list(analysisResults.keys()))
     except Exception as e:
+        traceback.print_exc()
         return return_error(str(e), 404)
 
-    return return_json(metricsResults)
+    # Encode metrics in a more readable way
+    for domain, similarity in analysisResults.items():
+        (hot, cold, unique) = raw[domain]
+        raw[domain] = {}
+        raw[domain]['hot'] = hot
+        raw[domain]['cold'] = cold
+        raw[domain]['unique'] = unique
+        raw[domain]['deviation'] = similarity
+
+    computedObject = {"originalityScores": metricsResults, "rawMetrics": raw}
+
+    return return_json(computedObject)
