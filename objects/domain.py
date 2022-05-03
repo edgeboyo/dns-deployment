@@ -1,4 +1,5 @@
 import json
+import os
 import time
 
 from objects.io import fetchDomainFile, listDomainNames, runSSGA
@@ -49,6 +50,12 @@ def createNewDomain(domainName):
 def fetchDomain(domainName):
     with open(fetchDomainFile(domainName)) as f:
         return json.load(f)
+
+
+def deleteDomain(domainName):
+    domainFile = fetchDomainFile(domainName)
+
+    os.remove(domainFile)
 
 
 def fetchAllDomainNames():
@@ -115,3 +122,30 @@ def requestRecords(domainName: str):
     records = interpretRecord(domain['records'], secondLevel, tld)
 
     return records
+
+
+def findSimilarDomains(domain: str, similarity: int, **kargs):
+    baseSSGA = fetchDomain(domain)['ssgaResult']
+    setBaseSSGA = set(baseSSGA)
+
+    if baseSSGA == None:
+        raise Exception("Cannot analyze domain with no Semantic String")
+
+    similarity = int(similarity)
+    analyzedDomain = domain
+    results = {}
+    for domainName in listDomainNames():
+        if domainName == analyzedDomain:
+            continue
+
+        domain = fetchDomain(domainName)
+        ssga = domain['ssgaResult']
+        setSSGA = set(ssga)
+
+        difference = len((setBaseSSGA | setSSGA) -
+                         setBaseSSGA.intersection(setSSGA))
+
+        if difference <= similarity:
+            results[domainName] = difference
+
+    return results

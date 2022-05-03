@@ -113,6 +113,7 @@ def dns_response(data, requesterIP):
         else:
             Logger.logColdAccess(sld, time.time())
 
+    TTL = 3600
     cacheTTL = 0
     # All of this stuff might get thrown out
     for name, rss in records.items():

@@ -83,6 +83,7 @@ def runSSGA(uri):
 
 
 def fetchDomainFile(domainName, forCreation=False):
+    domainName = domainName.lower()
     filePath = os.path.join(dataFolder, domainName + ".json")
 
     exists = os.path.exists(filePath) and os.path.isfile(filePath)
