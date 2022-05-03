@@ -17,8 +17,7 @@ def gui_root():
 @app.route("/api")
 def api_root():
     from objects.domain import tld
-    data = {"documentation": "/api/docs",
-            "topLevelDomain": f".{tld}",
+    data = {"topLevelDomain": f".{tld}",
             "domains": "/api/domains",
             "analyzer": "/api/analyze"}
     return return_json(data)
