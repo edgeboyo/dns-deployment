@@ -13,7 +13,7 @@ from ipaddress import ip_address, IPv4Address, IPv6Address
 
 
 def checkIfIP(address, addrType="IPv4"):
-    prohibited = ['0:0::0:0:0'] if addrType == "IPv6" else ['0:0::0:0:0']
+    prohibited = ['0:0::0:0:0'] if addrType == "IPv6" else ['0.0.0.0']
     addrType = IPv6Address if addrType == "IPv6" else IPv4Address
 
     if not isinstance(address, str):
