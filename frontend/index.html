@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Part 3 Project Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/networkgraph.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+  </head>
+  <body>
+    <form>
+      <label for="endpoint">Address of DNS manager endpoint</label> <br />
+      <input id="endpoint" name="endpoint" placeholder="dns.edgeboyo.me" />
+      <br />
+      <label for="domain">Domain to analyze</label> <br />
+      <input id="domain" name="domain" placeholder="i.e. google.com" /> <br />
+      <label for="index">Required similarity index</label> <br />
+      <select name="index" id="index">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+      </select> <br/>
+      <input type="button" value="Run Query" id="button" />
+    </form>
+    <div id="container"></div>
+
+    <h3>Raw JSON data</h3>
+
+    <pre id="raw"></pre>
+    <script src="scripts/request.js"></script>
+    <script src="scripts/placeholder.js"></script>
+  </body>
+</html>

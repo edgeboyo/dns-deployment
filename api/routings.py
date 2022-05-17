@@ -1,5 +1,6 @@
 import traceback
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
+from flask_cors import CORS
 from metrics.analysis import analyzeDomains
 
 from objects.domain import createNewDomain, deleteDomain, fetchAllDomainNames, fetchDomain, findSimilarDomains, overrideRecords
@@ -7,11 +8,13 @@ from objects.domain import createNewDomain, deleteDomain, fetchAllDomainNames, f
 from api.returns import return_json, return_error
 
 app = Flask(__name__)
+CORS(app)
 
 
-@app.route("/")
-def gui_root():
-    return "<p>This will be the GUI root later</p>"
+@app.route("/<path:path>")
+def gui_root(path):
+    path = "index.html" if path == "" else path
+    return send_from_directory('frontend', path)
 
 
 @app.route("/api")
