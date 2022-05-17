@@ -1,5 +1,6 @@
 import traceback
 from flask import Flask, request
+from flask_cors import CORS
 from metrics.analysis import analyzeDomains
 
 from objects.domain import createNewDomain, deleteDomain, fetchAllDomainNames, fetchDomain, findSimilarDomains, overrideRecords
@@ -7,6 +8,7 @@ from objects.domain import createNewDomain, deleteDomain, fetchAllDomainNames, f
 from api.returns import return_json, return_error
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route("/")
