@@ -5,15 +5,15 @@ function runQuery() {
   const domain = document.getElementById("domain").value;
   const index = document.getElementById("index").value;
 
-  const request = `http://${endpoint}/?domain=${domain}&similarity=${index}`;
+  const request = `/api/analyze?domain=${domain}&similarity=${index}`;
 
   console.log(request);
 
-  fetch(request)
-    .then((data) => {
-      return data.json();
-    })
-    .then((res) => {
-      console.log(res);
+  fetch(request).then((data) => {
+    data.json().then((json) => {
+      const jsonString = JSON.stringify(json, null, 2);
+      document.getElementById("raw").innerHTML = jsonString;
+      console.log(json);
     });
+  });
 }

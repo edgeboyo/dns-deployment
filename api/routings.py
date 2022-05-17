@@ -11,10 +11,18 @@ app = Flask(__name__)
 CORS(app)
 
 
+@app.route("/")
+def gui_root():
+    return gui_files('index.html')
+
+
 @app.route("/<path:path>")
-def gui_root(path):
-    path = "index.html" if path == "" else path
-    return send_from_directory('frontend', path)
+def gui_files(path):
+    try:
+        return send_from_directory('../frontend', path)
+    except:
+        traceback.print_exc()
+        raise
 
 
 @app.route("/api")
