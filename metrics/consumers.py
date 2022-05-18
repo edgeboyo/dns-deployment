@@ -10,7 +10,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 from metrics.loggers import checkMetrics, consumeAccessLog, disableMetrics
 
 bucket = "p3-bucket"
-
+org = None
 client: InfluxDBClient = None
 
 
@@ -27,6 +27,7 @@ def setUpInfluxDBClient(idb_url, idb_port, idb_org, idb_token):
         query_api = client.query_api()
         query_api.query(
             f'from(bucket:"{bucket}") |> range(start: -10m)')
+        org = idb_org
     except:
         print("Error connecting to Influx DB")
         traceback.print_exc()
@@ -70,3 +71,15 @@ def consume(threadId):
             traceback.print_exc()
             print("Continueing thread")
             continue
+
+
+def deleteDomainMetrics(domainName):
+    delete_api = client.delete_api()
+
+    from objects.utils import epoch, stampToISO
+
+    start = epoch
+    stop = stampToISO(time.time())
+
+    delete_api.delete(
+        start, stop, f'secondLevelDomain="{domainName}"', org=org,  bucket=bucket)
