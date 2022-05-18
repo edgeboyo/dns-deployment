@@ -162,9 +162,13 @@ def api_analyze():
         traceback.print_exc()
         return return_error(str(e), 404)
 
-    raw = raw | edgeRaw
+    raw.update(edgeRaw)
+    allDomains = similarDomains.copy()
+    allDomains.update(edgeDomains)
+
+    print(raw)
     # Encode metrics in a more readable way
-    for domain, similarity in (similarDomains | edgeDomains).items():
+    for domain, similarity in allDomains.items():
         (hot, cold, unique) = raw[domain]
         raw[domain] = {}
         raw[domain]['hot'] = hot
