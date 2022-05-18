@@ -125,13 +125,14 @@ def requestRecords(domainName: str):
 
 
 def findSimilarDomains(domain: str, similarity: int, **kargs):
+    similarity = int(similarity)
+
     baseSSGA = fetchDomain(domain)['ssgaResult']
     setBaseSSGA = set(baseSSGA)
 
     if baseSSGA == None:
         raise Exception("Cannot analyze domain with no Semantic String")
 
-    similarity = int(similarity)
     analyzedDomain = domain
     results = {}
     for domainName in listDomainNames():
@@ -149,3 +150,16 @@ def findSimilarDomains(domain: str, similarity: int, **kargs):
             results[domainName] = difference
 
     return results
+
+
+def findSimilarAndEdgeDomains(domain: str, similarity: int, edge=1, **kargs):
+    similarity = int(similarity)
+    edge = int(edge)
+
+    threshold = similarity + edge
+    results = findSimilarDomains(domain, threshold)
+
+    similar = filter(lambda res: res[1] <= similarity, results.items())
+    edge = filter(lambda res: res[1] > similarity, results.items())
+
+    return (dict(similar), dict(edge))

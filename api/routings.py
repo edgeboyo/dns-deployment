@@ -1,10 +1,10 @@
 import traceback
 from flask import Flask, request
 from flask_cors import CORS
-from metrics.analysis import analyzeDomains
+from metrics.analysis import fetchMetrics, processMetrics
 from metrics.consumers import deleteDomainMetrics
 
-from objects.domain import createNewDomain, deleteDomain, fetchAllDomainNames, fetchDomain, findSimilarDomains, overrideRecords
+from objects.domain import createNewDomain, deleteDomain, fetchAllDomainNames, fetchDomain, findSimilarAndEdgeDomains, findSimilarDomains, overrideRecords
 
 from api.returns import return_json, return_error
 
@@ -153,16 +153,18 @@ def api_analyze():
             return return_error(f"{desc} as `{field}` field in your query parameters")
 
     try:
-        analysisResults = findSimilarDomains(**arguments)
-        analysisResults[arguments['domain']] = 0
-        print(analysisResults)
-        (metricsResults, raw) = analyzeDomains(list(analysisResults.keys()))
+        (similarDomains, edgeDomains) = findSimilarAndEdgeDomains(**arguments)
+        similarDomains[arguments['domain']] = 0
+        raw = fetchMetrics(list(similarDomains.keys()))
+        edgeRaw = fetchMetrics(list(edgeDomains.keys()))
+        originalityScores = processMetrics(raw)
     except Exception as e:
         traceback.print_exc()
         return return_error(str(e), 404)
 
+    raw = raw | edgeRaw
     # Encode metrics in a more readable way
-    for domain, similarity in analysisResults.items():
+    for domain, similarity in (similarDomains | edgeDomains).items():
         (hot, cold, unique) = raw[domain]
         raw[domain] = {}
         raw[domain]['hot'] = hot
@@ -170,6 +172,19 @@ def api_analyze():
         raw[domain]['unique'] = unique
         raw[domain]['deviation'] = similarity
 
-    computedObject = {"originalityScores": metricsResults, "rawMetrics": raw}
+    (_, original) = max([(v, k) for k, v in originalityScores.items()])
+
+    squatters = list(filter(
+        lambda name: name != original, originalityScores.keys()))
+
+    edgeDomains = list(edgeDomains.keys())
+
+    computedObject = {
+        "suspectedOriginal": original,
+        "suspectedSquatters": squatters,
+        "edgeDomains": edgeDomains,
+        "originalityScores": originalityScores,
+        "rawMetrics": raw
+    }
 
     return return_json(computedObject)

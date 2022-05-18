@@ -1,6 +1,6 @@
 
 
-def analyzeDomains(domainList):
+def fetchMetrics(domainList):
     from metrics.consumers import client, bucket
 
     rawMetrics = {}
@@ -63,7 +63,7 @@ def analyzeDomains(domainList):
         rawMetrics[domain] = (
             hotAccessValue, coldAccessValue, uniqueAccessValue)
 
-    return (processMetrics(rawMetrics), rawMetrics)
+    return rawMetrics
 
 
 def processMetrics(metrics):
