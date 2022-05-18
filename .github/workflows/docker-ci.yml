@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  Dry Run:
+  Dry_Run:
     runs-on: ubuntu-latest
 
     steps:
@@ -41,7 +41,7 @@ jobs:
       - name: Run Python Unit Tests
         run: pytest .
 
-  Build Image:
+  Build_Image:
     needs: [Dry_Run, Test]
     runs-on: ubuntu-latest
 
