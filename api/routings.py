@@ -2,6 +2,7 @@ import traceback
 from flask import Flask, request
 from flask_cors import CORS
 from metrics.analysis import analyzeDomains
+from metrics.consumers import deleteDomainMetrics
 
 from objects.domain import createNewDomain, deleteDomain, fetchAllDomainNames, fetchDomain, findSimilarDomains, overrideRecords
 
@@ -81,6 +82,7 @@ def api_delete_domain(domainName):
     except Exception as e:
         return return_error(str(e), 404)
 
+    deleteDomainMetrics(domainName)
     return return_json({"message": "Domain removed"})
 
 
