@@ -1,11 +1,14 @@
 from threading import Thread
 import time
+import traceback
 import requests
 import random
 from typoGenerator import createDerivations
 import dns.resolver
 
-uri = '127.0.0.1'
+uri = '35.189.114.151'
+# relay_uri = "127.0.0.1"
+relay_uri = "relay.dns.edgeboyo.me"
 
 
 def createDomain(dn):
@@ -34,10 +37,25 @@ def performCalls(domain, amount):
         try:
             resolver.resolve(domain + ".com")
         except:
-            pass  # Some errors are expected in a stress test like this
+            print("Resolver error. Retrying...")
+            continue  # Some errors are expected in a stress test like this
 
         amount -= 1
-        time.sleep(random.randint(1, 2))
+        time.sleep(random.randint(30, 50) / 100)
+
+
+def performRelayCall(domain):
+    try:
+        obj = {
+            "dns": uri,
+            "domain": domain
+        }
+        r = requests.get(
+            f"http://{relay_uri}/request", params=obj)
+        return r.text
+    except:
+        traceback.print_exc()
+        return performRelayCall(domain)
 
 
 validDomains = ['google', 'facebook', 'southampton']
@@ -63,6 +81,11 @@ for dn, calls in calls.items():
 # Wait for all the calls to finish
 for thread in threads:
     thread.join()
+
+# Perform VPS calls for more uniqueness
+
+for dn in validDomains:
+    performRelayCall(dn + ".com")
 
 print("Stress test finished. Running analysis")
 
