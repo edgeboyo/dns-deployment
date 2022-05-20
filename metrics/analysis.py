@@ -119,13 +119,13 @@ def processMetrics(metrics):
         scores[domain] += max(propStarter, 0)
         propStarter -= 1
 
-    coldStarter = 3
+    coldStarter = 2
     for rank in coldRank:
         (_, domain) = rank
         scores[domain] += max(coldStarter, 0)
         coldStarter -= 1
 
-    hotStarter = 1
+    hotStarter = 2
     for rank in hotRank:
         (_, domain) = rank
         scores[domain] += max(hotStarter, 0)

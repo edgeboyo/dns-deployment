@@ -37,7 +37,7 @@ def performCalls(domain, amount):
         try:
             resolver.resolve(domain + ".com")
         except:
-            print("Resolver error. Retrying...")
+            # print("Resolver error. Retrying...")
             continue  # Some errors are expected in a stress test like this
 
         amount -= 1
